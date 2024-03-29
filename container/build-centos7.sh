@@ -48,6 +48,12 @@ if [[ "$sclo" == '1' ]]; then
 fi
 
 pip3 install --retries=10 --timeout 200 --upgrade tox setuptools "lxml<5.1" jinja2
+
+# another strange thing with python3 - some paths are not in sys.path when script is called from spec file
+# so add them as a workaround to sys.path explicitely
+echo "/usr/local/lib64/python3.6/site-packages" > /usr/lib64/python3.6/site-packages/locallib.pth
+echo "/usr/local/lib/python3.6/site-packages" >> /usr/lib64/python3.6/site-packages/locallib.pth
+
 # NOTE: we have to remove /usr/local/bin/virtualenv after installing tox by python3 because it has python3 as shebang and masked
 # /usr/bin/virtualenv with python2 shebang. it can be removed later when all code will be ready for python3
 rm -f /usr/local/bin/virtualenv

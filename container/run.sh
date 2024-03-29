@@ -74,6 +74,13 @@ function fetch() {
 function configure() {
     # targets can use yum and will block each other. don't run them in parallel
 
+    echo "INFO: CONTRAIL_BRANCH=${CONTRAIL_BRANCH^^}"
+    if [[ ! "${CONTRAIL_BRANCH^^}" =~ 'R1912' && ! "${CONTRAIL_BRANCH^^}" =~ 'R2011' && ! "${CONTRAIL_BRANCH^^}" =~ 'R21.4' ]]; then
+        # install all python tools for build with python3 only
+        # after full switch of build to python3 - drop these tools from reqs in spec files
+        python3 -m pip install scons future lxml sphinx requests setuptools "pyyaml<6"
+    fi
+
     local targets="$@"
     [ -n "$targets" ] || targets="setup tpp dep"
 
