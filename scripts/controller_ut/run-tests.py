@@ -76,9 +76,7 @@ class TungstenTestRunner(object):
         args = ""
         if not self.args.skip_tests:
             return args
-        command = [shutil.which("python2"),
-                   shutil.which("scons"),
-                   "--help"]
+        command = [shutil.which("scons"), "--help"]
         lines = subprocess.check_output(command).decode('utf-8').split("\n")
         for line in lines:
             if line.strip().split('=')[0] == '--skip-tests':
@@ -88,10 +86,7 @@ class TungstenTestRunner(object):
 
     def describe_tests(self):
         logging.info("Gathering tests for the following targets: %s", (self.args.targets))
-        command = [shutil.which("python2"),
-                   shutil.which("scons"),
-                   "--describe-tests",
-                   self._skip_tests_args()] + self.args.targets
+        command = [shutil.which("scons"), "--describe-tests", self._skip_tests_args()] + self.args.targets
         lines = subprocess.check_output(command).decode('utf-8').split("\n")
         for line in lines:
             if len(line) == 0 or line[0] != '{':
@@ -115,11 +110,7 @@ class TungstenTestRunner(object):
             args += ['--kernel-dir=/lib/modules/{}/build'.format(scons_env['KVERS'])]
         if not self.args.strict:
             scons_env['NO_HEAPCHECK'] = '1'
-        command = [shutil.which("python2"),
-                   shutil.which("scons"),
-                   "-j", str(self.args.job_count),
-                   "--keep-going",
-                   self._skip_tests_args()] + args + targets
+        command = [shutil.which("scons"), "-j", str(self.args.job_count), "--keep-going", self._skip_tests_args()] + args + targets
         logging.info("Executing SCons command: %s", " ".join(command))
         rc = subprocess.call(command, env=scons_env)
         return rc, targets
