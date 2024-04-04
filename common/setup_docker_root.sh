@@ -147,6 +147,15 @@ try:
     data = json.load(f)
 except Exception:
   pass
+  
+data["default-ulimits"] = {
+    "nofile": {
+      "Name": "nofile",
+      "Soft": 1024,
+      "Hard": 1048576
+    }
+}
+
 if "$UPDATE_INSECURE_REGISTRY" == "true":
   data.setdefault("insecure-registries", list())
   for i in "$insecure_registries".split(','):
