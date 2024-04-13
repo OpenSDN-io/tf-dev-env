@@ -18,9 +18,9 @@ fi
 cd $REPODIR
 echo "INFO: current folder is $(pwd)"
 
-repo_init_defauilts='--repo-branch=repo-1'
-repo_sync_defauilts='--no-tags --no-clone-bundle -q '
-[ -n "$DEBUG" ] && repo_init_defauilts+=' -q' && repo_sync_defauilts+=' -q'
+repo_init_defaults='--repo-branch=stable'
+repo_sync_defaults='--no-tags --no-clone-bundle -q '
+[ -n "$DEBUG" ] && repo_init_defaults+=' -q' && repo_sync_defaults+=' -q'
 
 REPO_INIT_MANIFEST_URL=${REPO_INIT_MANIFEST_URL:-"https://github.com/opensdn-io/tf-vnc"}
 VNC_ORGANIZATION=${VNC_ORGANIZATION:-"opensdn-io"}
@@ -43,13 +43,13 @@ if [[ -n "$CONTRAIL_BRANCH" ]] ; then
 fi
 
 REPO_INIT_MANIFEST_BRANCH=${REPO_INIT_MANIFEST_BRANCH:-${CONTRAIL_BRANCH}}
-REPO_INIT_OPTS=${REPO_INIT_OPTS:-${repo_init_defauilts}}
-REPO_SYNC_OPTS=${REPO_SYNC_OPTS:-${repo_sync_defauilts}}
+REPO_INIT_OPTS=${REPO_INIT_OPTS:-${repo_init_defaults}}
+REPO_SYNC_OPTS=${REPO_SYNC_OPTS:-${repo_sync_defaults}}
 REPO_TOOL=${REPO_TOOL:-"./repo"}
 
 if [[ ! -e $REPO_TOOL ]] ; then
   echo "INFO: Download repo tool"
-  curl -s -o $REPO_TOOL https://storage.googleapis.com/git-repo-downloads/repo-1 || exit 1
+  curl -s -o $REPO_TOOL https://storage.googleapis.com/git-repo-downloads/repo || exit 1
   chmod a+x $REPO_TOOL
 fi
 
@@ -203,6 +203,21 @@ fi
 #TODO: think about repos with non-master branches: tf-kolla-ansible, tf-tripleo-heat-templates
 mkdir -p ${REPODIR}/tf-build-manifest
 $REPO_TOOL manifest -r -o ${REPODIR}/tf-build-manifest/manifest.xml
+
+echo "INFO: manifest result:"
+cat ${REPODIR}/tf-build-manifest/manifest.xml
+
+# repo tool makes .git folder inside as a symlink to .repo folder
+# we have to make a copy to be able to pack src and use it later
+echo "INFO: dereference .git folders"
+for gitlink in $(find . -name .git | grep -v '.repo') ; do
+  if [[ -L $gitlink ]]; then
+    gitpath=$(readlink -f "$gitlink")
+    echo "$gitpath -> $gitlink"
+    rm -f "$gitlink"
+    cp -LR "$gitpath" "$gitlink"
+  fi
+done
 
 echo "INFO: gathering UT targets"
 if [ -e "$patchsets_info_file" ] ; then

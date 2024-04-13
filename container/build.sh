@@ -28,6 +28,8 @@ if [ -n "$YUM_ENABLE_REPOS" ] ; then
 fi
 if [[ "$LINUX_DISTR" =~ 'centos' ]] ; then
     docker_file="Dockerfile.centos"
+elif [[ "$LINUX_DISTR" =~ 'rocky' ]] ; then
+    docker_file="Dockerfile.rocky"
 else
     if [[ "$LINUX_DISTR" =~ 'ubi7' ]] ; then
         docker_file="Dockerfile.ubi7"
