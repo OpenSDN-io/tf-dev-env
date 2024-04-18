@@ -77,7 +77,7 @@ RUN \
         sudo net-tools httpd \
         podman-docker podman-3.2.3-0.11.module+el8.4.0+12050+ef972f71 \
         python3-devel python3-lxml python3-virtualenv python3-future python3-tox \
-        libtirpc-devel compat-openssl10 compat-openssl10-debugsource python2-pyyaml && \
+        libtirpc-devel compat-openssl10 compat-openssl10-debugsource python2-pyyaml python3-distro && \
     rpm -ivh --nodeps $(repoquery -q --location --latest-limit 1  "mariadb-connector-c-3.*x86_64*"  | head -n 1) && \
     rpm -ivh --nodeps $(repoquery -q --location --latest-limit 1  "mariadb-connector-c-devel-3.*x86_64*"  | head -n 1) && \
     pip3 install --retries=10 --timeout 200 --upgrade tox setuptools "lxml<5.1" jinja2 && \

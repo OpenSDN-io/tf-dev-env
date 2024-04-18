@@ -18,7 +18,7 @@ dnf -y install \
   make cmake libuv-devel rpm-build vim wget \
   rpmdevtools sudo gcc-c++ net-tools httpd elfutils-libelf-devel \
   python3-virtualenv python3-future python3-tox python3-devel python3-lxml \
-  doxygen graphviz
+  doxygen graphviz python3-distro
 
 # next packages are required for UT
 dnf -y install java-1.8.0-openjdk

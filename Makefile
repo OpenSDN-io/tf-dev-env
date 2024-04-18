@@ -22,7 +22,7 @@ setup:
 	@python3 -m pip list | grep urllib3 >/dev/null && python3 -m pip uninstall -y urllib3 requests chardet || true
 	@python3 -m pip -q uninstall -y setuptools || true
 	@yum -q reinstall -y python3-setuptools
-	@yum -q install -y python3-requests python3-urllib3 python3-distro
+	@yum -q install -y python3-requests python3-urllib3
 
 sync:
 	@$(TF_DE_DIR)scripts/sync-sources.sh
