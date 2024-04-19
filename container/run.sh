@@ -78,7 +78,7 @@ function configure() {
     if [[ ! "${CONTRAIL_BRANCH^^}" =~ 'R1912' && ! "${CONTRAIL_BRANCH^^}" =~ 'R2011' && ! "${CONTRAIL_BRANCH^^}" =~ 'R21.4' ]]; then
         # install all python tools for build with python3 only
         # after full switch of build to python3 - drop these tools from reqs in spec files
-        python3 -m pip install scons future lxml sphinx requests setuptools "pyyaml<6"
+        python3 -m pip install scons future lxml "Sphinx<7.3.0" requests setuptools "pyyaml<6"
     fi
 
     local targets="$@"
