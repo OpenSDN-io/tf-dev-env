@@ -15,14 +15,19 @@ with open("%s/contrail/controller/ci_unittests.json" % home_dir, 'r') as fh:
 # load vnc structure to evaluate UT targets
 # stdin is a patchsets_info.json file wich has gerrit plain structure
 # ci_unittests.json has vnc structure
+remotes = dict()
+projects = dict()
 with open("%s/contrail/.repo/manifest.xml" % home_dir, 'r') as f:
     vnc_raw = ElementTree.parse(f).getroot()
-remotes = dict()
-for remote in vnc_raw.findall(".//remote"):
-    remotes[remote.get('name')] = remote.get('fetch').split('/')[-1]
-projects = dict()
-for project in vnc_raw.findall(".//project"):
-    projects[remotes[project.get('remote')] + '/' + project.get('name')] = project.get('path')
+roots = [vnc_raw]
+for include in vnc_raw.findall(".//include"):
+    with open("%s/contrail/.repo/manifests/%s" % (home_dir, include.get('name')), 'r') as f:
+        roots.append(ElementTree.parse(f).getroot())
+for root in roots:
+    for remote in root.findall(".//remote"):
+        remotes[remote.get('name')] = remote.get('fetch').split('/')[-1]
+    for project in root.findall(".//project"):
+        projects[remotes[project.get('remote')] + '/' + project.get('name')] = project.get('path')
 
 review_files = set()
 for patchset in patchsets:
