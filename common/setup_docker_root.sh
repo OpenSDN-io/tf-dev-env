@@ -70,6 +70,7 @@ function install_docker_rocky() {
   dnf install -y dnf-utils device-mapper-persistent-data lvm2
   dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
   retry dnf install -y docker-ce device-mapper-libs device-mapper-event-libs
+  dnf remove -y docker-buildx-plugin
   systemctl start docker
 }
 
