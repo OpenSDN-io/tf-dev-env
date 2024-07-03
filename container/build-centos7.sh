@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
+sed -i 's/mirrorlist=mirrorlist.centos.org/#mirrorlist=mirrorlist.centos.org/g' /etc/yum.repos.d/CentOS-*
+sed -Ei 's|^#([[:blank:]]*baseurl=http://mirror.centos.org)|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+sed -i 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.repos.d/*.repo
+echo ip_resolve=4 >> /etc/yum.conf
+
 if ! yum info jq ; then
   yum -y install epel-release
 fi
@@ -18,6 +23,8 @@ sclo=0
 if ! yum repolist | grep -q "centos-sclo-rh" ; then
   sclo=1
   yum -y install centos-release-scl
+  sed -i 's/mirrorlist=mirrorlist.centos.org/#mirrorlist=mirrorlist/g' /etc/yum.repos.d/CentOS-*
+  sed -Ei 's|^#([[:blank:]]*baseurl=http://mirror.centos.org)|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 fi
 
 echo "INFO: installing newer git"
@@ -69,3 +76,4 @@ wget -nv ${SITE_MIRROR:-"https://github.com"}/operator-framework/operator-sdk/re
 wget -nv ${SITE_MIRROR:-"https://github.com"}/operator-framework/operator-sdk/releases/download/v0.18.2/operator-sdk-v0.18.2-x86_64-linux-gnu -O /usr/local/bin/operator-sdk-v0.18
 ln -s /usr/local/bin/operator-sdk-v0.18 /usr/local/bin/operator-sdk
 chmod u+x /usr/local/bin/operator-sdk-v0.17 /usr/local/bin/operator-sdk-v0.18 /usr/local/bin/operator-sdk
+
