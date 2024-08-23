@@ -180,6 +180,8 @@ function package() {
     uname -a
     make info
 
+    set -x
+
     # frozen may have contrail repo set (e.g. if tpp changed)
     # it is needed to have up rpm repo any stage that operates with yum
     make setup-httpd
