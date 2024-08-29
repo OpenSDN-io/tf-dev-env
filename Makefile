@@ -24,6 +24,12 @@ setup:
 	@python2 -m pip -q uninstall -y setuptools || true
 	@yum -q reinstall -y python2-setuptools
 	@yum -q install -y python2-requests python2-urllib3
+	@mkdir -p /root/work/build/include || true
+	@mkdir -p /root/work/build/lib || true
+	@ln -sf /usr/include/boost169/boost/ /root/work/build/include/boost
+	@ln -sf /usr/lib64/boost169/libboost_*.so* /root/work/build/lib/
+	@ln -sf /usr/lib64/boost169/libboost_.so.1.69.0 /root/work/build/lib/
+	@ln -sf /root/work/build/lib/libboost_python36.so /root/work/build/lib/libboost_python.so
 
 sync:
 	@$(TF_DE_DIR)scripts/sync-sources.sh

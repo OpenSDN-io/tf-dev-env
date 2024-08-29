@@ -46,7 +46,8 @@ yum -y install \
   rpmdevtools sudo gcc-c++ net-tools httpd \
   python-virtualenv python-future python-tox \
   elfutils-libelf-devel \
-  doxygen graphviz python3-distro
+  doxygen graphviz python3-distro \
+  boost169 boost169-devel
 # next packages are required for UT
 yum -y install java-1.8.0-openjdk
 yum clean all
@@ -57,6 +58,8 @@ if [[ "$sclo" == '1' ]]; then
 fi
 
 pip3 install --retries=10 --timeout 200 --upgrade tox setuptools "lxml<5.1" jinja2
+
+yum -y remove boost boost-devel
 
 # another strange thing with python3 - some paths are not in sys.path when script is called from spec file
 # so add them as a workaround to sys.path explicitely

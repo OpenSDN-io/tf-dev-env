@@ -63,9 +63,8 @@ echo "INFO: tpp: make prep"
 make prep
 
 # build packages which are required for next steps in determined order
-# boost 1st (cpp 3d-party depends on it)
 # python-mimeparse and python-extras (python-setuptools depends on it)
-for pkg in boost python-mimeparse python-extras ; do
+for pkg in python-mimeparse python-extras ; do
     target=$(echo "$all_targets" | grep $pkg)
     if [ -n "$target" ] ; then
         echo "INFO: tpp: make $target"
