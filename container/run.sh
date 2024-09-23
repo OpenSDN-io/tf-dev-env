@@ -138,6 +138,9 @@ function compile() {
     echo "INFO: create rpm repo $(date)"
     # Workaround for symlinked RPMS - rename of repodata to .oldata in createrepo utility fails otherwise
     rm -rf $WORK_DIR/RPMS/repodata
+    # remove all built rpm-s if stage is compile - otherwise package may take newer files from frozen container
+    rm $WORK_DIR/RPMS/*.rpm
+
     make create-repo
     if [[ "$targets" =~ 'tpp' ]] ; then
         if [[ "$targets" == 'tpp' ]] ; then 
