@@ -81,6 +81,11 @@ function configure() {
         python3 -m pip install scons future lxml "Sphinx<7.3.0" requests setuptools "pyyaml<6"
     fi
 
+    if [[ ! "${CONTRAIL_BRANCH^^}" =~ '24.1' ]]; then
+        yum -y install boost169 boost169-devel
+        yum -y remove boost boost-devel
+    fi
+
     local targets="$@"
     [ -n "$targets" ] || targets="setup tpp dep"
 
@@ -90,6 +95,9 @@ function configure() {
     if [[ "$targets" =~ 'setup' ]] ; then
         echo "INFO: make setup  $(date)"
         make setup
+        if [[ ! "${CONTRAIL_BRANCH^^}" =~ '24.1' ]]; then
+            make setup-boost
+        fi
     fi
 
     if [[ "$targets" =~ 'tpp' ]] ; then
