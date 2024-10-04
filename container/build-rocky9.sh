@@ -11,14 +11,23 @@ fi
 # to fix locale warning and to enable following cmd
 dnf install -y langpacks-en glibc-all-langpacks dnf-utils
 
-dnf --enable config-manager devel crb
-
 dnf -y install \
-  python3 iproute autoconf automake createrepo gdb git git-review jq libtool \
-  make cmake libuv-devel rpm-build vim wget \
+  python3 iproute autoconf createrepo gdb git git-review jq libtool \
+  make cmake libuv-devel rpm-build vim wget docker-ce rsync \
   rpmdevtools sudo gcc-c++ net-tools httpd elfutils-libelf-devel \
   python3-virtualenv python3-future python3-tox python3-devel python3-lxml \
-  doxygen graphviz python3-distro
+  doxygen graphviz python3-distro perl-diagnostics tbb openssl openssl-devel \
+  libcap-devel libnghttp2-devel boost boost-devel rapidjson-devel
+
+# build automake 1.16.5 since rocky9 provides only 1.16.2
+# required for bind-9.21.3
+cd /usr/local/src
+wget https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz
+tar -xzf automake-1.16.5.tar.gz
+cd automake-1.16.5
+./configure --prefix=/usr/local
+make
+make install
 
 # next packages are required for UT
 dnf -y install java-1.8.0-openjdk
@@ -32,7 +41,12 @@ rpm -ivh --nodeps $(repoquery -q --location --latest-limit 1  "mariadb-connector
 dnf clean all
 rm -rf /var/cache/dnf
 
-pip3 install --retries=10 --timeout 200 --upgrade tox setuptools "lxml<5.1" jinja2 wheel pip2pi
+pip3 install --retries=10 --timeout 200 --upgrade tox "setuptools==76.0" "lxml<5.1" jinja2 wheel pip2pi "chardet<5"
+
+# another strange thing with python3 - some paths are not in sys.path when script is called from spec file
+# so add them as a workaround to sys.path explicitely
+echo "/usr/local/lib64/python3.9/site-packages" > /usr/lib64/python3.9/site-packages/locallib.pth
+echo "/usr/local/lib/python3.9/site-packages" >> /usr/lib64/python3.9/site-packages/locallib.pth
 
 wget -nv ${SITE_MIRROR:-"https://dl.google.com"}/go/go1.23.4.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.23.4.linux-amd64.tar.gz
@@ -41,8 +55,6 @@ echo export PATH=$PATH:/usr/local/go/bin >> $HOME/.bashrc
 
 # install, customize and configure compat ssl 1.0.2o
 rpm -ivh https://pkgs.sysadmins.ws/el9/base/x86_64/raven-release.el9.noarch.rpm
-dnf install -y compat-openssl10 compat-openssl10-devel
-# ?? ${SITE_MIRROR:-"https://koji.mbox.centos.org"}/pkgs/packages/compat-openssl10/1.0.2o/3.el8/x86_64/compat-openssl10-debugsource-1.0.2o-3.el8.x86_64.rpm
 
 OPENSSL_ROOT_DIR=/usr/local/ssl
 echo export OPENSSL_ROOT_DIR=/usr/local/ssl >> $HOME/.bashrc
@@ -52,11 +64,6 @@ echo export C_INCLUDE_PATH=$OPENSSL_ROOT_DIR/include:/usr/include/tirpc >> $HOME
 echo export CPLUS_INCLUDE_PATH=$C_INCLUDE_PATH >> $HOME/.bashrc
 echo export LDFLAGS=\"-L/usr/local/lib -L$OPENSSL_ROOT_DIR/lib\" >> $HOME/.bashrc
 echo export PATH=$PATH:$OPENSSL_ROOT_DIR/bin >> $HOME/.bashrc
-
-mkdir -p $OPENSSL_ROOT_DIR/lib
-ln -s /usr/src/debug/compat-openssl10-1.0.2o-3.el8.x86_64/include $OPENSSL_ROOT_DIR/include
-ln -s /usr/lib64/libcrypto.so.10 $OPENSSL_ROOT_DIR/lib/libcrypto.so
-ln -s /usr/lib64/libssl.so.10 $OPENSSL_ROOT_DIR/lib/libssl.so
 
 # pre-load archives for analytics UT
 mkdir -p /tmp/cache-systemless_test

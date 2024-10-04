@@ -44,7 +44,7 @@ function fetch() {
     # paths must be fixed inside tf-dev-sandbox container
     for vfile in $(find .. -name version.info); do
         echo "INFO: patching file $vfile"
-        echo $CONTRAIL_CONTAINER_TAG | sed 's/[_-]/./g' > $vfile
+        echo "v0+$CONTRAIL_CONTAINER_TAG" | sed 's/[_-]/./g' > $vfile
     done
 
     # Invalidate stages after new fetch. For fast build and patchest invalidate only if needed.
@@ -84,6 +84,15 @@ function configure() {
     if [[ ! "${CONTRAIL_BRANCH^^}" =~ 'R24.1' && ! "${LINUX_DISTR}" == "rockylinux" ]]; then
         yum -y install boost169 boost169-devel
         yum -y remove boost boost-devel
+    fi
+
+    if [[ "${LINUX_DISTR}" == "rockylinux" ]]; then
+        # on rocky contrail-web-core requires coffee and livescript
+        # unlike centos7, js is not precompiled, so we install via npm and symlink
+        dnf -y install npm-1:8.19.4
+        npm install -g coffeescript livescript || true
+        ln -s /usr/local/bin/coffee /usr/bin/coffee || true
+        ln -s /usr/local/bin/lsc /usr/bin/lsc || true
     fi
 
     local targets="$@"
