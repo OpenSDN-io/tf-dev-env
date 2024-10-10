@@ -81,12 +81,17 @@ function configure() {
         python3 -m pip install scons future lxml "Sphinx<7.3.0" requests setuptools "pyyaml<6"
     fi
 
-    if [[ ! "${CONTRAIL_BRANCH^^}" =~ '24.1' ]]; then
+    if [[ ! "${CONTRAIL_BRANCH^^}" =~ '24.1' && ! "${LINUX_DISTR}" == "rockylinux" ]]; then
         yum -y install boost169 boost169-devel
         yum -y remove boost boost-devel
     fi
 
     local targets="$@"
+    ########## TODO: remove it !!!!!!!!!!!
+    if [[ -z "$targets" && "${LINUX_DISTR}" == "rockylinux" ]]; then
+        targets="tpp dep"
+    fi
+    ######################################
     [ -n "$targets" ] || targets="setup tpp dep"
 
     # frozen may have contrail repo set (e.g. if tpp changed)
@@ -95,7 +100,7 @@ function configure() {
     if [[ "$targets" =~ 'setup' ]] ; then
         echo "INFO: make setup  $(date)"
         make setup
-        if [[ ! "${CONTRAIL_BRANCH^^}" =~ '24.1' ]]; then
+        if [[ ! "${CONTRAIL_BRANCH^^}" =~ '24.1' && ! "${LINUX_DISTR}" == "rockylinux" ]]; then
             make setup-boost
         fi
     fi
