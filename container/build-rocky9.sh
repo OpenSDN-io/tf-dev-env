@@ -11,7 +11,7 @@ fi
 # to fix locale warning and to enable following cmd
 dnf install -y langpacks-en glibc-all-langpacks dnf-utils
 
-dnf --enable config-manager tf-mirrors.ci_repos_yum9-crb
+dnf --enable config-manager devel crb
 
 dnf -y install \
   python3 iproute autoconf automake createrepo gdb git git-review jq libtool \
