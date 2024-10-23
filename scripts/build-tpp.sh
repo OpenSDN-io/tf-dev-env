@@ -56,7 +56,11 @@ fi
 export BUILD_BASE=${REPODIR}
 pushd ${tpp_dir}/upstream/rpm
 echo "INFO: tpp: make list"
-all_targets=$(make list --no-print-directory)
+if [[ $LINUX_DISTR == 'rockylinux' ]] ; then
+    all_targets="cassandra-cpp-driver-2.17.1 kafka librdkafka-1.6.1 net-snmp userspace-rcu zookeeper-3.9.2"
+else
+    all_targets=$(make list --no-print-directory)
+fi
 echo "$all_targets"
 all_targets=$(echo "$all_targets" | tr ' ' '\n')
 echo "INFO: tpp: make prep"
