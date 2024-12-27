@@ -10,9 +10,9 @@ if [[ -z "${REPODIR}" ]] ; then
   exit 1
 fi
 
-buildsh=${REPODIR}/contrail-container-builder/containers/build.sh
+buildsh=${REPODIR}/tf-container-builder/containers/build.sh
 if ! [[ -x "${buildsh}" ]] ; then
-  echo "ERROR: build.sh tool from contrail-container-builder is not available in ${REPODIR} or is not executable"
+  echo "ERROR: build.sh tool from tf-container-builder is not available in ${REPODIR} or is not executable"
   exit 1
 fi
 
@@ -64,7 +64,7 @@ done
 
 mkdir -p /output/logs/container-builder-src
 # do not fail script if logs files are absent
-mv ${REPODIR}/contrail-container-builder/containers/*.log /output/logs/container-builder-src/ || /bin/true
+mv ${REPODIR}/tf-container-builder/containers/*.log /output/logs/container-builder-src/ || /bin/true
 
 if [[ $res == 1 ]] ; then
   echo "ERROR: There were some errors when source containers builded."

@@ -5,7 +5,7 @@ source "$scriptdir/../../common/common.sh"
 source_env
 
 REPODIR=${REPODIR:-"."}
-CONTAINER_BUILDER_DIR=${CONTAINER_BUILDER_DIR:-"${REPODIR}/contrail-container-builder"}
+CONTAINER_BUILDER_DIR=${CONTAINER_BUILDER_DIR:-"${REPODIR}/tf-container-builder"}
 COPY_REPO_GLOB=${COPY_REPO_GLOB:-"$CONTRAIL_CONFIG_DIR/etc/yum.repos.d/*.repo"}
 
 for file in $COPY_REPO_GLOB /etc/yum.repos.d/tpc.repo; do

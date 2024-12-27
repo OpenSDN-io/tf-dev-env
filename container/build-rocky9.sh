@@ -32,7 +32,7 @@ rpm -ivh --nodeps $(repoquery -q --location --latest-limit 1  "mariadb-connector
 dnf clean all
 rm -rf /var/cache/dnf
 
-pip3 install --retries=10 --timeout 200 --upgrade tox setuptools "lxml<5.1" jinja2
+pip3 install --retries=10 --timeout 200 --upgrade tox setuptools "lxml<5.1" jinja2 wheel pip2pi
 
 #TODO: update go to 1.21
 wget -nv ${SITE_MIRROR:-"https://dl.google.com"}/go/go1.14.2.linux-amd64.tar.gz

@@ -5,7 +5,7 @@ STAGES_DIR="${WORK_DIR}/.stages"
 
 # Folders and artifacts which have to be symlinked in order to separate them from sources
 
-declare -a work_folders=(build BUILDROOT BUILD RPMS SOURCES SRPMS SRPMSBUILD .sconf_temp  SPECS .stages)
+declare -a work_folders=(build BUILDROOT BUILD RPMS SOURCES SRPMS SRPMSBUILD .sconf_temp SPECS .stages)
 declare -a work_files=(.sconsign.dblite)
 
 function create_env_file() {
@@ -42,9 +42,6 @@ EOF
   if [[ -n "${BASE_EXTRA_RPMS+x}" ]] ; then
     echo "export BASE_EXTRA_RPMS=${BASE_EXTRA_RPMS}" >> $tf_container_env_file
   fi
-  if [[ -n "${RHEL_HOST_REPOS+x}" ]] ; then
-    echo "export RHEL_HOST_REPOS=${RHEL_HOST_REPOS}" >> $tf_container_env_file
-  fi
 
   if [[ -d "${scriptdir}/config" ]]; then
     echo "export CONTRAIL_CONFIG_DIR=${CONTRAIL_CONFIG_DIR:-'/config'}" >> $tf_container_env_file
@@ -62,8 +59,7 @@ EOF
   fi
 }
 
-function prepare_infra()
-{
+function prepare_infra() {
   echo "INFO: create symlinks to work directories with artifacts  $(date)"
   mkdir -p $HOME/work /root/contrail
   # /root/contrail will be defined later as REPODIR
@@ -79,8 +75,7 @@ function prepare_infra()
   yum clean all
 }
 
-function get_current_container_tag()
-{
+function get_current_container_tag() {
   if curl -sI "http://nexus.opensdn.io:8082/frozen/tag" | grep -q "HTTP/1.1 200 OK" ; then
     curl -s "http://nexus.opensdn.io:8082/frozen/tag"
   fi
@@ -88,8 +83,7 @@ function get_current_container_tag()
 
 # Classification of TF projects dealing with containers.
 # TODO: use vnc/default.xml for this information later (loaded to .repo/manifest.xml)
-deployers_projects=("tf-charms" "tf-helm-deployer" "tf-ansible-deployer" "tf-operator" \
-  "tf-kolla-ansible" "tf-tripleo-heat-templates" "tf-container-builder")
+deployers_projects=("tf-charms" "tf-ansible-deployer" "tf-kolla-ansible" "tf-container-builder")
 containers_projects=("tf-container-builder")
 operator_projects=("tf-operator")
 tests_projects=("tf-test" "tf-deployment-test")

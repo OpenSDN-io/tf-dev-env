@@ -6,7 +6,7 @@ SHELL=/bin/bash -o pipefail
 -include $(TF_DE_TOP)contrail/tools/packages/Makefile
 
 REPODIR=$(TF_DE_TOP)contrail
-CONTAINER_BUILDER_DIR=$(REPODIR)/contrail-container-builder
+CONTAINER_BUILDER_DIR=$(REPODIR)/tf-container-builder
 CONTRAIL_TEST_DIR=$(REPODIR)/third_party/contrail-test
 export REPODIR
 export CONTRAIL_TEST_DIR
@@ -41,6 +41,7 @@ sync:
 create-repo:
 	@mkdir -p $(REPODIR)/RPMS
 	@createrepo --update $(REPODIR)/RPMS/
+	@dir2pi /pip/
 	@echo "INFO: clean all for contrail repo after udpate"
 	@yum clean all --disablerepo=* --enablerepo=contrail || true
 

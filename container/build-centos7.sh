@@ -18,8 +18,6 @@ fi
 yum -y update -x nss*
 yum -y downgrade nss*
 
-curl -s --retry 3 --retry-delay 10 ${SITE_MIRROR:-"https://bootstrap.pypa.io"}/pip/2.7/get-pip.py | python2 - 'pip==20.1'
-
 sclo=0
 if ! yum repolist | grep -q "centos-sclo-rh" ; then
   sclo=1
@@ -56,7 +54,7 @@ if [[ "$sclo" == '1' ]]; then
   rm -rf /var/cache/yum /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
 fi
 
-pip3 install --retries=10 --timeout 200 --upgrade tox setuptools "lxml<5.1" jinja2
+pip3 install --retries=10 --timeout 200 --upgrade tox setuptools "lxml<5.1" jinja2 wheel pip2pi
 
 # another strange thing with python3 - some paths are not in sys.path when script is called from spec file
 # so add them as a workaround to sys.path explicitely
