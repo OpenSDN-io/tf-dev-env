@@ -218,16 +218,12 @@ function package() {
             echo "INFO: deployers containers has changed"
             make_containers="src-containers"
         fi
-        if [[ ! -z $changed_operator_projects ]] ; then
-            make_containers="${make_containers} operator-containers"
-            echo "INFO: operator containers has changed"
-        fi
         if [[ ! -z $changed_tests_projects ]] ; then
             make_containers="${make_containers} test-containers"
             echo "INFO: test containers has changed"
         fi
     else
-        make_containers="containers src-containers test-containers operator-containers"
+        make_containers="containers src-containers test-containers"
     fi
 
     # build containers

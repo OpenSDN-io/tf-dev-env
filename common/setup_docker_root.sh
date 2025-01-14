@@ -36,35 +36,6 @@ function install_docker_centos() {
   retry yum install -y docker-ce-cli-20.10.9 docker-ce-20.10.9
 }
 
-function install_docker_rhel_7() {
-  which docker && return
-  if [[ "$ENABLE_RHSM_REPOS" == "true" ]]; then
-    subscription-manager repos \
-      --enable rhel-7-server-extras-rpms \
-      --enable rhel-7-server-optional-rpms
-  fi
-  retry yum install -y docker device-mapper-libs device-mapper-event-libs
-  systemctl start docker
-}
-
-function install_docker_rhel_8() {
-  which podman && return
-  if [[ "$ENABLE_RHSM_REPOS" == "true" ]]; then
-    subscription-manager repos \
-      --enable rhel-8-server-extras-rpms \
-      --enable rhel-8-server-optional-rpms
-  fi
-  echo "INFO: dnf disable modules container-tools"
-  dnf module disable -y container-tools || true
-  declare -A ct_vers=(["8.2"]="2.0" ["8.4"]="3.0")
-  echo "INFO: dnf enable container-tools:${ct_vers[$DISTRO_VER]}"
-  dnf module enable -y container-tools:${ct_vers[$DISTRO_VER]}
-  retry dnf install -y podman-docker podman device-mapper-libs device-mapper-event-libs
-  touch /etc/containers/nodocker
-  sed -i 's/.*image_default_format.*/image_default_format = "v2s2"/g' /usr/share/containers/containers.conf
-  sed -i 's/.*image_build_format.*/image_build_format = "docker"/g' /usr/share/containers/containers.conf
-}
-
 function install_docker_rocky() {
   which docker && return
   dnf install -y dnf-utils device-mapper-persistent-data lvm2
@@ -74,13 +45,6 @@ function install_docker_rocky() {
   systemctl start docker
 }
 
-declare -A install_docker_rhel=(
-  ['7.8']=install_docker_rhel_7
-  ['7.9']=install_docker_rhel_7
-  ['8.2']=install_docker_rhel_8
-  ['8.4']=install_docker_rhel_8
-)
-
 function check_docker_value() {
   local name=$1
   local value=$2
@@ -88,59 +52,14 @@ function check_docker_value() {
 }
 
 function check_insecure_registry() {
-  case ${DISTRO}_${DISTRO_VER} in
-    rhel_8.2|rhel_8.4)
-        grep -A 1 '\[registries.insecure\]' /etc/containers/registries.conf | \
-          grep -o 'registries[ ]*='.* | cut -d '=' -f 2 | \
-          jq -cr '.[]' | \
-          grep -q "^$1$"
-      ;;
-    *)
-      check_docker_value "insecure-registries" "$1"
-      ;;
-  esac
+  check_docker_value "insecure-registries" "$1"
 }
 
 function update_config_docker() {
   local insecure_registries="$1"
   local default_iface_mtu="$2"
-  case ${DISTRO}_${DISTRO_VER} in
-    rhel_8.2|rhel_8.4)
-      local cf="/etc/containers/registries.conf"
-      echo "INFO: update insecure registries in config $cf"
-      local ir
-      local cr=$(grep -A 1 '\[registries.insecure\]' $cf \
-        | grep -o 'registries[ ]*='.* | cut -d '=' -f 2 \
-        | jq -c ".")
-      for ir in ${insecure_registries//,/ } ; do
-        cr=$(echo "$cr" | jq -c ". += [ \"$ir\" ]")
-      done
-      cp $cf ${cf}.bkp
-      awk "{ if (s==1) {s=0; print(\"registries = ${cr//\"/\\\"}\")} else if (\$1==\"[registries.insecure]\") {print(\$0); s=1} else {print(\$0)} }" $cf > ${cf}.tf
-      mv ${cf}.tf $cf
-      local pcf="/etc/cni/net.d/87-podman-bridge.conflist"
-      echo "INFO: update mtu in $pcf"
-      python <<EOF
-import json
-data = dict()
-conf = "$pcf"
-try:
-  with open(conf) as f:
-    data = json.load(f)
-    for d in data["plugins"]:
-      if d["type"] == "bridge" and d["bridge"] == "cni-podman0":
-        d["mtu"] = $default_iface_mtu
-except Exception as e:
-  print("ERROR: failed to update mtu in %s: %s" % (conf, e))
-  import sys
-  sys.exit(1)
-with open(conf, "w") as f:
-  data = json.dump(data, f, sort_keys=True, indent=4)
-EOF
-      ;;
-    *)
-      [ ! -e /etc/docker/daemon.json ] && touch /etc/docker/daemon.json
-      python <<EOF
+  [ ! -e /etc/docker/daemon.json ] && touch /etc/docker/daemon.json
+  python <<EOF
 import json
 data=dict()
 try:
@@ -167,48 +86,26 @@ data["live-restore"] = True
 with open("/etc/docker/daemon.json", "w") as f:
   data = json.dump(data, f, sort_keys=True, indent=4)
 EOF
-      ;;
-  esac
 }
 
 function get_docker_mtu() {
-  case ${DISTRO}_${DISTRO_VER} in
-    rhel_8.2|rhel_8.4)
-      jq -cr '.plugins[] | select(.type == "bridge") | select(.bridge == "cni-podman0") | .mtu' /etc/cni/net.d/87-podman-bridge.conflist | grep -v null || true
-      ;;
-    *)
-      docker network inspect --format='{{index .Options "com.docker.network.driver.mtu"}}' bridge
-      ;;
-  esac
+  docker network inspect --format='{{index .Options "com.docker.network.driver.mtu"}}' bridge
 }
 
 function set_docker_mtu() {
   local default_iface_mtu=$1
   echo "INFO: set docker0 mtu to $default_iface_mtu"
-  case ${DISTRO}_${DISTRO_VER} in
-    rhel_8.2|rhel_8.4)
-      echo "INFO: rhel8.x - nothing to do to podman"
-      ;;
-    *)
-      if [ -x "$(command -v ifconfig)" ]; then
-          ifconfig docker0 mtu $default_iface_mtu || true
-      else
-          ip link set dev docker0 mtu $default_iface_mtu || true
-      fi
-      ;;
-  esac
+  if [ -x "$(command -v ifconfig)" ]; then
+      ifconfig docker0 mtu $default_iface_mtu || true
+  else
+      ip link set dev docker0 mtu $default_iface_mtu || true
+  fi
 }
 
 function restart_docker() {
   echo "INFO: restart docker"
   if [[ x"$DISTRO" == x"centos" || x"$DISTRO" == x"rocky" ]] ; then
     systemctl restart docker
-  elif [ x"$DISTRO" == x"rhel" ] ; then
-    if [ ! "${DISTRO_VER}" =~ "8." ]; then
-      systemctl restart docker
-    else
-      echo "INFO: restart docker skipped - no docker in ${DISTRO_VER}"
-    fi
   elif [ x"$DISTRO" == x"ubuntu" ]; then
     service docker reload
   else
@@ -227,9 +124,6 @@ if ! which docker >/dev/null 2>&1 ; then
     systemctl start docker
   #  grep 'dm.basesize=20G' /etc/sysconfig/docker-storage || sed -i 's/DOCKER_STORAGE_OPTIONS=/DOCKER_STORAGE_OPTIONS=--storage-opt dm.basesize=20G /g' /etc/sysconfig/docker-storage
   #  systemctl restart docker
-  elif [ x"$DISTRO" == x"rhel" ]; then
-    systemctl stop firewalld || true
-    ${install_docker_rhel[$DISTRO_VER]}
   elif [ x"$DISTRO" == x"ubuntu" ]; then
     install_docker_ubuntu
   elif [ x"$DISTRO" == x"rocky" ]; then
@@ -238,12 +132,10 @@ if ! which docker >/dev/null 2>&1 ; then
   fi
 else
   echo "INFO: docker installed: $(docker --version)"
-  if [ x"$DISTRO" != x"rhel" ]; then
-    version=$(docker version --format '{{.Client.Version}}' 2>/dev/null | head -1 | cut -d '.' -f 1)
-    if (( version < 16)); then
-      echo "ERROR: docker is too old. please remove it. tf-dev-env will install correct version."
-      exit 1
-    fi
+  version=$(docker version --format '{{.Client.Version}}' 2>/dev/null | head -1 | cut -d '.' -f 1)
+  if (( version < 16)); then
+    echo "ERROR: docker is too old. please remove it. tf-dev-env will install correct version."
+    exit 1
   fi
 fi
 

@@ -30,7 +30,6 @@ export CONTAINER_REGISTRY=${CONTAINER_REGISTRY}
 export VENDOR_NAME=$VENDOR_NAME
 export VENDOR_DOMAIN=$VENDOR_DOMAIN
 export MULTI_KERNEL_BUILD=$MULTI_KERNEL_BUILD
-export KERNEL_REPOSITORIES_RHEL8="$KERNEL_REPOSITORIES_RHEL8"
 export CONTRAIL_SOURCE=${CONTRAIL_DIR}
 export BUILDTAG=${CONTRAIL_CONTAINER_TAG//-/_}
 export REPO_INIT_MANIFEST_URL=$REPO_INIT_MANIFEST_URL
@@ -85,7 +84,6 @@ function get_current_container_tag() {
 # TODO: use vnc/default.xml for this information later (loaded to .repo/manifest.xml)
 deployers_projects=("tf-charms" "tf-ansible-deployer" "tf-kolla-ansible" "tf-container-builder")
 containers_projects=("tf-container-builder")
-operator_projects=("tf-operator")
 tests_projects=("tf-test" "tf-deployment-test")
 vrouter_dpdk=("tf-dpdk")
 infra_projects=("tf-jenkins" "tf-dev-env" "tf-devstack" "tf-dev-test")
@@ -93,7 +91,6 @@ infra_projects=("tf-jenkins" "tf-dev-env" "tf-devstack" "tf-dev-test")
 changed_projects=()
 changed_containers_projects=()
 changed_deployers_projects=()
-changed_operator_projects=()
 changed_tests_projects=()
 changed_product_projects=()
 unchanged_containers=()
@@ -111,7 +108,6 @@ function patches_exist() {
   changed_projects=()
   changed_containers_projects=()
   changed_deployers_projects=()
-  changed_operator_projects=()
   changed_tests_projects=()
   changed_product_projects=()
   projects=$(jq '.[].project' "/input/patchsets-info.json")
@@ -128,10 +124,6 @@ function patches_exist() {
     fi
     if [[ ${deployers_projects[@]} =~ $project ]] ; then
       changed_deployers_projects+=($project)
-      non_container_project=false
-    fi
-    if [[ ${operator_projects[@]} =~ $project ]] ; then
-      changed_operator_projects+=($project)
       non_container_project=false
     fi
     if [[ ${tests_projects[@]} =~ $project ]] ; then
@@ -153,10 +145,6 @@ function patches_exist() {
       fi
     elif [[ $container == *-src ]] ; then
       if [[ -z $changed_deployers_projects ]] ; then
-        unchanged_containers+=($container)
-      fi
-    elif [[ $container == *-operator ]] ; then
-      if [[ -z $changed_operator_projects ]] ; then
         unchanged_containers+=($container)
       fi
     else

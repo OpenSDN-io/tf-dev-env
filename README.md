@@ -197,10 +197,6 @@ The descriptions of targets:
 
 - `make test-containers` - build test containers
 
-#### TF Operator containers
-
-- `make operator-containers` - build tf-operator container
-
 #### Source containers
 
 - `make src-containers` - build containers with source of deployer code

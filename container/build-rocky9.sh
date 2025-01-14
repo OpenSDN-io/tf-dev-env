@@ -34,15 +34,10 @@ rm -rf /var/cache/dnf
 
 pip3 install --retries=10 --timeout 200 --upgrade tox setuptools "lxml<5.1" jinja2 wheel pip2pi
 
-#TODO: update go to 1.21
-wget -nv ${SITE_MIRROR:-"https://dl.google.com"}/go/go1.14.2.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.14.2.linux-amd64.tar.gz
-rm -f go1.14.2.linux-amd64.tar.gz
+wget -nv ${SITE_MIRROR:-"https://dl.google.com"}/go/go1.23.4.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.23.4.linux-amd64.tar.gz
+rm -f go1.23.4.linux-amd64.tar.gz
 echo export PATH=$PATH:/usr/local/go/bin >> $HOME/.bashrc
-# wget -nv ${SITE_MIRROR:-"https://github.com"}/operator-framework/operator-sdk/releases/download/v0.17.2/operator-sdk-v0.17.2-x86_64-linux-gnu -O /usr/local/bin/operator-sdk-v0.17
-# wget -nv ${SITE_MIRROR:-"https://github.com"}/operator-framework/operator-sdk/releases/download/v0.18.2/operator-sdk-v0.18.2-x86_64-linux-gnu -O /usr/local/bin/operator-sdk-v0.18
-# ln -s /usr/local/bin/operator-sdk-v0.18 /usr/local/bin/operator-sdk
-# chmod u+x /usr/local/bin/operator-sdk-v0.17 /usr/local/bin/operator-sdk-v0.18 /usr/local/bin/operator-sdk
 
 # install, customize and configure compat ssl 1.0.2o
 rpm -ivh https://pkgs.sysadmins.ws/el9/base/x86_64/raven-release.el9.noarch.rpm

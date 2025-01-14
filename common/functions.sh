@@ -84,14 +84,6 @@ function install_prerequisites_centos() {
   which pip || mysudo alternatives --verbose --install /usr/bin/pip pip $(which pip3) 100
 }
 
-function install_prerequisites_rhel() {
-  local pkgs=""
-  if [[ ${DISTRO}_${DISTRO_VER} == 'rhel_8.2' || ${DISTRO}_${DISTRO_VER} == 'rhel_8.4' ]]; then
-    pkgs="jq"
-  fi
-  install_prerequisites_centos "$pkgs"
-}
-
 function install_prerequisites_rocky() {
   local pkgs="jq lsof python3 python3-pip"
   mysudo dnf install -y $pkgs

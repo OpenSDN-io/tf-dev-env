@@ -76,9 +76,6 @@ export DEVENV_IMAGE=${DEVENV_IMAGE:-"${DEVENV_IMAGE_NAME}:${DEVENV_TAG}"}
 # build options
 export MULTI_KERNEL_BUILD=${MULTI_KERNEL_BUILD:-"false"}
 
-# RHEL specific build options
-export ENABLE_RHSM_REPOS=${ENABLE_RHSM_REPOS:-'false'}
-
 # versions info
 export CONTRAIL_CONTAINER_TAG=${CONTRAIL_CONTAINER_TAG:-'dev'}
 # tag for existing prebuilt containers reflecting current merged code in gerrit.
