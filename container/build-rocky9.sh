@@ -45,7 +45,7 @@ echo export PATH=$PATH:/usr/local/go/bin >> $HOME/.bashrc
 # chmod u+x /usr/local/bin/operator-sdk-v0.17 /usr/local/bin/operator-sdk-v0.18 /usr/local/bin/operator-sdk
 
 # install, customize and configure compat ssl 1.0.2o
-rpm -ivh https://pkgs.dyn.su/el9/base/x86_64/raven-release.el9.noarch.rpm
+rpm -ivh https://pkgs.sysadmins.ws/el9/base/x86_64/raven-release.el9.noarch.rpm
 dnf install -y compat-openssl10 compat-openssl10-devel
 # ?? ${SITE_MIRROR:-"https://koji.mbox.centos.org"}/pkgs/packages/compat-openssl10/1.0.2o/3.el8/x86_64/compat-openssl10-debugsource-1.0.2o-3.el8.x86_64.rpm
 
