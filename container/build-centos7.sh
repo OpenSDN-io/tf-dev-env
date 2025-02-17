@@ -1,9 +1,7 @@
 #!/bin/bash -e
 
-sed -i 's/mirrorlist=mirrorlist.centos.org/#mirrorlist=mirrorlist.centos.org/g' /etc/yum.repos.d/CentOS-*
-#sed -i 's|mirrorlist=http://mirrorlist.centos.org|#http://mirrorlist=mirrorlist|g' /etc/yum.repos.d/CentOS-*
-sed -Ei 's|^#([[:blank:]]*baseurl=http://mirror.centos.org)|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
-sed -i 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.repos.d/*.repo
+sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+sed -i 's|#\s*baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 echo ip_resolve=4 >> /etc/yum.conf
 
 if ! yum info jq ; then
