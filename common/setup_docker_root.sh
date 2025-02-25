@@ -33,7 +33,7 @@ function install_docker_centos() {
   which docker && return
   yum install -y yum-utils device-mapper-persistent-data lvm2 ca-certificates
   yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-  retry yum install -y docker-ce-cli-20.10.9 docker-ce-20.10.9
+  retry yum install -y docker-ce-cli docker-ce
 }
 
 function install_docker_rocky() {
