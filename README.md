@@ -14,7 +14,8 @@ Recommended:
 - instance with 4+ virtual CPU, 16+ GB of RAM and 64 GB of disk space
 
 - Ubuntu 18.04
-- CentOS 7.x
+- CentOS 7.x 
+  WARNING: Use the ext4 file system
 - MacOS (Experimental support, please ensure that you have brew and coreutils installed)
 
 ## Quick start
@@ -23,6 +24,13 @@ Recommended:
 
 Enable passwordless sudo for your user
 (for centos example: [serverfault page](https://serverfault.com/questions/160581/how-to-setup-passwordless-sudo-on-linux))
+
+Change configuration for CentOS repositories:
+
+```bash
+sudo sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+sudo sed -i 's|#\s*baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+```
 
 Install git:
 
