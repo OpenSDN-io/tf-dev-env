@@ -6,8 +6,7 @@ src_root=$HOME/contrail
 cd $src_root
 logs_path="/output/logs"
 test_reports_dir="$logs_path/test-reports"
-coverage_reports_dir="$logs_path/coverage-reports"
-mkdir -p "$logs_path" "$test_reports_dir" "$coverage_reports_dir"
+mkdir -p "$logs_path" "$test_reports_dir"
 
 function pre_test_setup() {
     #Update the featurePkg path in contrail-web-core/config/config.global.js  with Controller, Storage and Server Manager features
@@ -40,9 +39,6 @@ function copy_reports(){
 
     echo "info: gathering XML test reports..."
     cp -p contrail-web*/$report_dir/tests/*-test-results.xml $test_reports_dir || true
-
-    echo "info: gathering XML coverage reports..."
-    cp -p $HOME/contrail/contrail-web-controller/$report_dir/coverage/*/*/cobertura-coverage.xml $coverage_reports_dir/controller-cobertura-coverage.xml || true
 }
 
 #This installs node, npm and does a fetch_packages, make prod env, test setup
@@ -60,5 +56,4 @@ if [[ "$res" != '0' ]]; then
 fi
 echo "INFO: Unit test log is available at contrail/output/logs/web_controller_unittests.log"
 echo "INFO: Test report is available at  contrail/output/logs/test-reports/web-controller-test-results.xml"
-echo "INFO: Coverage report is available at contrail/output/logs/coverage-reports/controller-cobertura-coverage.xml"
 exit $res
