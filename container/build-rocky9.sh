@@ -57,3 +57,10 @@ mkdir -p $OPENSSL_ROOT_DIR/lib
 ln -s /usr/src/debug/compat-openssl10-1.0.2o-3.el8.x86_64/include $OPENSSL_ROOT_DIR/include
 ln -s /usr/lib64/libcrypto.so.10 $OPENSSL_ROOT_DIR/lib/libcrypto.so
 ln -s /usr/lib64/libssl.so.10 $OPENSSL_ROOT_DIR/lib/libssl.so
+
+# pre-load archives for analytics UT
+mkdir -p /tmp/cache-systemless_test
+wget -nv --tries=3 -c -P /tmp/cache-systemless_test ${SITE_MIRROR:-"https://github.com"}/OpenSDN-io/tf-third-party-cache/raw/master/zookeeper/zookeeper-3.4.5.tar.gz
+wget -nv --tries=3 -c -P /tmp/cache-systemless_test ${SITE_MIRROR:-"https://github.com"}/OpenSDN-io/tf-third-party-cache/raw/master/cassandra/apache-cassandra-3.10-bin.tar.gz
+wget -nv --tries=3 -c -P /tmp/cache-systemless_test ${SITE_MIRROR:-"https://github.com"}/OpenSDN-io/tf-third-party-cache/raw/master/kafka/kafka_2.11-2.3.1.tgz
+wget -nv --tries=3 -c -P /tmp/cache-systemless_test ${SITE_MIRROR:-"https://github.com"}/OpenSDN-io/tf-third-party-cache/raw/master/redis/redis-2.6.13.tar.gz

@@ -23,4 +23,9 @@ wget -nv -t3 -P rhel/7/os/x86_64 https://packages.endpointdev.com/rhel/7/os/x86_
 wget -nv -t3 -P rhel/7/os/x86_64 https://packages.endpointdev.com/rhel/7/os/x86_64/git-core-doc-2.37.1-1.ep7.noarch.rpm
 wget -nv -t3 -P rhel/7/os/x86_64 https://packages.endpointdev.com/rhel/7/os/x86_64/perl-Git-2.37.1-1.ep7.noarch.rpm
 
+wget -nv -t3 -P OpenSDN-io/tf-third-party-cache/raw/master/zookeeper https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/zookeeper/zookeeper-3.4.5.tar.gz
+wget -nv -t3 -P OpenSDN-io/tf-third-party-cache/raw/master/cassandra https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/cassandra/apache-cassandra-3.10-bin.tar.gz
+wget -nv -t3 -P OpenSDN-io/tf-third-party-cache/raw/master/kafka     https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/kafka/kafka_2.11-2.3.1.tgz
+wget -nv -t3 -P OpenSDN-io/tf-third-party-cache/raw/master/redis     https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/redis/redis-2.6.13.tar.gz
+
 popd

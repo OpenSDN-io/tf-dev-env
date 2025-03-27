@@ -70,3 +70,10 @@ wget -nv ${SITE_MIRROR:-"https://dl.google.com"}/go/go1.23.4.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.23.4.linux-amd64.tar.gz
 rm -f go1.23.4.linux-amd64.tar.gz
 echo export PATH=$PATH:/usr/local/go/bin >> $HOME/.bashrc
+
+# pre-load archives for analytics UT
+mkdir -p /tmp/cache-systemless_test
+wget -nv --tries=3 -c -P /tmp/cache-systemless_test ${SITE_MIRROR:-"https://github.com"}/OpenSDN-io/tf-third-party-cache/raw/master/zookeeper/zookeeper-3.4.5.tar.gz
+wget -nv --tries=3 -c -P /tmp/cache-systemless_test ${SITE_MIRROR:-"https://github.com"}/OpenSDN-io/tf-third-party-cache/raw/master/cassandra/apache-cassandra-3.10-bin.tar.gz
+wget -nv --tries=3 -c -P /tmp/cache-systemless_test ${SITE_MIRROR:-"https://github.com"}/OpenSDN-io/tf-third-party-cache/raw/master/kafka/kafka_2.11-2.3.1.tgz
+wget -nv --tries=3 -c -P /tmp/cache-systemless_test ${SITE_MIRROR:-"https://github.com"}/OpenSDN-io/tf-third-party-cache/raw/master/redis/redis-2.6.13.tar.gz
