@@ -1,5 +1,5 @@
-[contrail-tpc]
-name=Third parties for Contrail
+[tpc]
+name=Third parties for OpenSDN
 baseurl=___SITE_MIRROR___/yum-tpc$releasever/
 enabled = 1
 gpgcheck = 0

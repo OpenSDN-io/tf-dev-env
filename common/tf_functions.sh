@@ -10,8 +10,8 @@ declare -a work_files=(.sconsign.dblite)
 
 function create_env_file() {
   # exports 'src_volume_name' as return result
-  local tf_container_env_file=$1
-  cat <<EOF > $tf_container_env_file
+  local container_env_file=$1
+  cat <<EOF > $container_env_file
 set -m
 export DEBUG=${DEBUG}
 export DEBUGINFO=${DEBUGINFO}
@@ -36,25 +36,25 @@ export REPO_INIT_MANIFEST_URL=$REPO_INIT_MANIFEST_URL
 export VNC_ORGANIZATION=$VNC_ORGANIZATION
 EOF
   if [[ -n "${GENERAL_EXTRA_RPMS+x}" ]] ; then
-    echo "export GENERAL_EXTRA_RPMS=${GENERAL_EXTRA_RPMS}" >> $tf_container_env_file
+    echo "export GENERAL_EXTRA_RPMS=${GENERAL_EXTRA_RPMS}" >> $container_env_file
   fi
   if [[ -n "${BASE_EXTRA_RPMS+x}" ]] ; then
-    echo "export BASE_EXTRA_RPMS=${BASE_EXTRA_RPMS}" >> $tf_container_env_file
+    echo "export BASE_EXTRA_RPMS=${BASE_EXTRA_RPMS}" >> $container_env_file
   fi
 
   if [[ -d "${scriptdir}/config" ]]; then
-    echo "export CONTRAIL_CONFIG_DIR=${CONTRAIL_CONFIG_DIR:-'/config'}" >> $tf_container_env_file
+    echo "export CONTRAIL_CONFIG_DIR=${CONTRAIL_CONFIG_DIR:-'/config'}" >> $container_env_file
   fi
 
   # code review system options
   if [[ -n "$GERRIT_URL" ]]; then
-    echo "export GERRIT_URL=${GERRIT_URL}" >> $tf_container_env_file
+    echo "export GERRIT_URL=${GERRIT_URL}" >> $container_env_file
   fi
   if [[ -n "$GERRIT_BRANCH" ]]; then
-    echo "export GERRIT_BRANCH=${GERRIT_BRANCH}" >> $tf_container_env_file
+    echo "export GERRIT_BRANCH=${GERRIT_BRANCH}" >> $container_env_file
   fi
   if [[ -n "$GERRIT_PROJECT" ]]; then
-    echo "export GERRIT_PROJECT=${GERRIT_PROJECT}" >> $tf_container_env_file
+    echo "export GERRIT_PROJECT=${GERRIT_PROJECT}" >> $container_env_file
   fi
 }
 

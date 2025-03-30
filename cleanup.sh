@@ -35,7 +35,7 @@ while getopts ":abh" opt; do
   esac
 done
 
-echo tf-dev-env cleanup
+echo dev-env cleanup
 if [[ $remove_containers -eq 1 ]] ; then
   echo
   echo '[containers]'
@@ -69,4 +69,4 @@ if [[ $remove_tf_dev_config -eq 1 ]] ; then
   [ -d "$TF_CONFIG_DIR" ] && mysudo rm -rf "$TF_CONFIG_DIR"
 fi
 
-echo tf-dev-env cleanup finished
+echo dev-env cleanup finished

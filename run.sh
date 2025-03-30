@@ -35,7 +35,7 @@ if [[ "$stage" == 'upload' ]]; then
   exit 0
 fi
 
-echo "INFO: tf-dev-env startup"
+echo "INFO: dev-env startup"
 echo
 echo 'INFO: ensure python is present'
 install_prerequisites_$DISTRO
@@ -67,7 +67,7 @@ echo
 echo 'INFO: environment setup'
 if ! is_container_created "$DEVENV_CONTAINER_NAME"; then
   if [[ "$stage" == 'frozen' ]]; then
-    echo "INFO: fetching frozen tf-dev-env from CI registry"
+    echo "INFO: fetching frozen dev-env from CI registry"
     devenv_image="$FROZEN_REGISTRY/$DEVENV_IMAGE_NAME:frozen"
   fi
 
