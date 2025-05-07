@@ -90,9 +90,11 @@ else
   echo "INFO: gerrit URL = ${GERRIT_URL}"
   cat $patchsets_info_file | jq '.'
   vnc_changes=$(cat $patchsets_info_file | jq -r ".[] | select(.project == \"${VNC_ORGANIZATION}/${VNC_REPO}\") | .project + \" \" + .ref + \" \" + .branch")
+  # "
   if [[ -n "$vnc_changes" ]] ; then
     # clone from GERRIT_URL cause this is taken from patchsets
     vnc_branch=$(echo "$vnc_changes" | head -n 1 | awk '{print($3)}')
+    # '
     rm -rf ${VNC_REPO}
     cmd="git clone --depth=1 --single-branch -b $vnc_branch ${GERRIT_URL}${VNC_ORGANIZATION}/${VNC_REPO} ${VNC_REPO}"
     echo "INFO: $cmd"
@@ -145,6 +147,7 @@ while read repo_project ; do
   while read repo_path && read commit && read revision ; do
     pushd $repo_path
       remote=$(git log -1 --pretty=%d HEAD | tr -d '(,)' | awk '{print($3)}')
+      # '
       [ -n "$remote" ] || {
         echo "ERROR: failed to get remote for tracking branch $revision for $repo_path : $repo_project"
         exit 1
