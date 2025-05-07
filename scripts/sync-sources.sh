@@ -172,19 +172,24 @@ fi
 if [ -e "$patchsets_info_file" ] ; then
   # apply patches
   echo "INFO: review dependencies"
-  cat $patchsets_info_file | jq -r '.[] | select(.project != "${VNC_ORGANIZATION}/${VNC_REPO}") | .project + " " + .ref' | while read project ref; do
+  cat $patchsets_info_file | jq -r '.[] | select(.project != "${VNC_ORGANIZATION}/${VNC_REPO}") | .project + " " + .ref + " " + .branch' | while read project ref branch; do
     short_name=$(echo $project | cut -d '/' -f 2)
     repo_projects=$($REPO_TOOL list -r "^${short_name}$" | tr -d ':' )
     # use manual filter as repo forall -regex checks both path and project
     while read -r repo_path repo_project ; do
       echo "INFO: process repo_path=$repo_path , repo_project=$repo_project"
       if [[ "$short_name" != "$repo_project" ]] ; then
-        echo "INFO: doesnt match to $short_name .. skipped"
+        echo "INFO: doesn't match to $short_name .. skipped"
         continue
       fi
       echo "INFO: apply change $ref for $project"
       echo "INFO: cmd: git fetch $GERRIT_URL/$project $ref && git cherry-pick FETCH_HEAD"
       pushd $repo_path
+      if ! git checkout $branch ; then
+        echo "ERROR: failed to switch branch to match it from review for $project"
+        exit 1
+      fi
+      git branch -a -vv
       if ! git fetch $GERRIT_URL/$project $ref ; then
         echo "ERROR: failed to fetch changes for $project"
         exit 1
