@@ -17,14 +17,6 @@ all: dep rpm containers
 fetch_packages:
 	@$(TF_DE_DIR)scripts/fetch-packages.sh
 
-# still required for old branches
-setup:
-	@yum autoremove -y python2-requests python2-urllib3 || true
-	@python2 -m pip list | grep urllib3 >/dev/null && python2 -m pip uninstall -y urllib3 requests chardet || true
-	@python2 -m pip -q uninstall -y setuptools || true
-	@yum -q reinstall -y python2-setuptools
-	@yum -q install -y python2-requests python2-urllib3
-
 setup-boost:
 	@mkdir -p /root/work/build/include || true
 	@mkdir -p /root/work/build/lib || true

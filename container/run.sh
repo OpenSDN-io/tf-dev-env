@@ -99,7 +99,6 @@ function configure() {
     make setup-httpd
     if [[ "$targets" =~ 'setup' ]] ; then
         echo "INFO: make setup  $(date)"
-        make setup
         if [[ ! "${CONTRAIL_BRANCH^^}" =~ 'R24.1' && ! "${LINUX_DISTR}" == "rockylinux" ]]; then
             make setup-boost
         fi
