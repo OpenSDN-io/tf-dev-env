@@ -29,30 +29,33 @@ if ! [[ -f "${dockerfile_template}" ]] ; then
 fi
 
 function build_container() {
-  local line=$1
+  local dirname=$1
+  local imagename=$2
   # clean .dockerignore before build to get full git repo inside src container
-  [ -f ${REPODIR}/${line}/.dockerignore ] && rm -f ${REPODIR}/${line}/.dockerignore
-  CONTRAIL_CONTAINER_NAME=${line}-src ${buildsh} ${REPODIR}/${line}
-  rm -f ${REPODIR}/${line}/Dockerfile
+  [ -f ${REPODIR}/${dirname}/.dockerignore ] && rm -f ${REPODIR}/${dirname}/.dockerignore
+  # build with prefix 'opensdn-' as a step to rname all
+  CUSTOM_CONTAINER_NAME=${imagename} ${buildsh} ${REPODIR}/${dirname}
+  rm -f ${REPODIR}/${dirname}/Dockerfile
 }
 
 jobs=""
 echo "INFO: ===== Start Build Containers at $(date) ====="
-while IFS= read -r line; do
-if ! [[ "$line" =~ ^\#.*$ ]] ; then
-  if ! [[ "$line" =~ ^[\-0-9a-zA-Z\/_.]+$ ]] ; then
-    echo "ERROR: Directory name ${line} must contain only latin letters, digits or '.', '-', '_' symbols  "
+while IFS= read -r dirname; do
+if ! [[ "$dirname" =~ ^\#.*$ ]] ; then
+  if ! [[ "$dirname" =~ ^[\-0-9a-zA-Z\/_.]+$ ]] ; then
+    echo "ERROR: Directory name ${dirname} must contain only latin letters, digits or '.', '-', '_' symbols  "
     exit 1
   fi
 
-  if ! [[ -d "${REPODIR}/${line}" ]] ; then
-    echo "WARNING: not found directory ${REPODIR}/${line} mentioned in ${publish_list_file}"
+  if ! [[ -d "${REPODIR}/${dirname}" ]] ; then
+    echo "WARNING: not found directory ${REPODIR}/${dirname} mentioned in ${publish_list_file}"
     continue
   fi
 
-  echo "INFO: Pack $line sources to container ${line}-src ${buildsh}"
-  cp -f ${dockerfile_template} ${REPODIR}/${line}/Dockerfile
-  build_container ${line} &
+  imagename="$(echo $dirname | sed 's/^tf/opensdn/')-src"
+  echo "INFO: Pack $dirname sources to container ${imagename} ${buildsh}"
+  cp -f ${dockerfile_template} ${REPODIR}/${dirname}/Dockerfile
+  build_container ${dirname} ${imagename} &
   jobs+=" $!"
 fi
 done < ${publish_list_file}
