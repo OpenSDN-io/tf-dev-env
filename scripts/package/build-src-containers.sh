@@ -34,12 +34,12 @@ function build_container() {
   # clean .dockerignore before build to get full git repo inside src container
   [ -f ${REPODIR}/${dirname}/.dockerignore ] && rm -f ${REPODIR}/${dirname}/.dockerignore
   # build with prefix 'opensdn-' as a step to rname all
-  CUSTOM_CONTAINER_NAME=${imagename} ${buildsh} ${REPODIR}/${dirname}
+  CONTRAIL_CONTAINER_NAME=${imagename} CUSTOM_CONTAINER_NAME=${imagename} ${buildsh} ${REPODIR}/${dirname}
   rm -f ${REPODIR}/${dirname}/Dockerfile
 }
 
 jobs=""
-echo "INFO: ===== Start Build Containers at $(date) ====="
+echo "INFO: ===== Start Build Containers for branch=${CONTRAIL_BRANCH,,} at $(date) ====="
 while IFS= read -r dirname; do
 if ! [[ "$dirname" =~ ^\#.*$ ]] ; then
   if ! [[ "$dirname" =~ ^[\-0-9a-zA-Z\/_.]+$ ]] ; then
@@ -52,7 +52,10 @@ if ! [[ "$dirname" =~ ^\#.*$ ]] ; then
     continue
   fi
 
-  imagename="$(echo $dirname | sed 's/^tf/opensdn/')-src"
+  imagename=$dirname
+  if [[ "${CONTRAIL_BRANCH,,}" =~ 'master' ]]; then
+    imagename="$(echo $dirname | sed 's/^tf/opensdn/')-src"
+  fi
   echo "INFO: Pack $dirname sources to container ${imagename} ${buildsh}"
   cp -f ${dockerfile_template} ${REPODIR}/${dirname}/Dockerfile
   build_container ${dirname} ${imagename} &
