@@ -13,8 +13,7 @@ Recommended:
 
 - instance with 4+ virtual CPU, 16+ GB of RAM and 64 GB of disk space
 
-- Ubuntu 18.04
-- CentOS 7.x
+- Rocky 9.5
 - MacOS (Experimental support, please ensure that you have brew and coreutils installed)
 
 ## Quick start
