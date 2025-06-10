@@ -453,6 +453,4 @@ Or if you want to deploy with the most recent sources from master use:
 tf-devstack/k8s_manifests/run.sh master
 ```
 
-## Notes
 
-- Vagrantfile is deprecated and is not supported. Will be removed later.
