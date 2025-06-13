@@ -14,6 +14,7 @@ Recommended:
 - instance with 4+ virtual CPU, 16+ GB of RAM and 64 GB of disk space
 
 - Rocky 9.5
+- Ubuntu 22
 - MacOS (Experimental support, please ensure that you have brew and coreutils installed)
 
 ## Quick start
