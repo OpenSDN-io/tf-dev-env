@@ -35,12 +35,6 @@ export BUILDTAG=${CONTRAIL_CONTAINER_TAG//-/_}
 export REPO_INIT_MANIFEST_URL=$REPO_INIT_MANIFEST_URL
 export VNC_ORGANIZATION=$VNC_ORGANIZATION
 EOF
-  if [[ -n "${GENERAL_EXTRA_RPMS+x}" ]] ; then
-    echo "export GENERAL_EXTRA_RPMS=${GENERAL_EXTRA_RPMS}" >> $container_env_file
-  fi
-  if [[ -n "${BASE_EXTRA_RPMS+x}" ]] ; then
-    echo "export BASE_EXTRA_RPMS=${BASE_EXTRA_RPMS}" >> $container_env_file
-  fi
 
   if [[ -d "${scriptdir}/config" ]]; then
     echo "export CONTRAIL_CONFIG_DIR=${CONTRAIL_CONFIG_DIR:-'/config'}" >> $container_env_file

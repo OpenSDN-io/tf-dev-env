@@ -174,12 +174,11 @@ if [[ "$BIND_CONTRAIL_DIR" != 'false' ]] ; then
 fi
 
 if [[ $result == 0 ]] ; then
-  # for next feature
-  #if [[ "$stage" == 'compile' ]] ; then
-  #  # commit state to be able to use it in next stage as an external layer
-  #  mysudo docker commit $DEVENV_CONTAINER_NAME ${DEVENV_IMAGE_NAME}:${stage}
-  #  mysudo docker images
-  #fi
+  if [[ "$stage" == 'compile' ]] ; then
+    # commit state to be able to use it in next stage as an external layer
+    mysudo docker commit $DEVENV_CONTAINER_NAME ${DEVENV_IMAGE_NAME}:${stage}
+    mysudo docker images
+  fi
 
   echo
   echo '[DONE]'
