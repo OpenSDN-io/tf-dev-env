@@ -4,9 +4,9 @@ if ! dnf info git-review ; then
   dnf -y install epel-release
 fi
 
-#if [ -f /etc/dnf.repos.d/pip.conf ] ; then
-#  mv /etc/dnf.repos.d/pip.conf /etc/
-#fi
+if [ -f /etc/dnf.repos.d/pip.conf ] ; then
+  mv /etc/dnf.repos.d/pip.conf /etc/
+fi
 
 # to fix locale warning and to enable following cmd
 dnf install -y langpacks-en glibc-all-langpacks dnf-utils
@@ -41,7 +41,7 @@ rpm -ivh --nodeps $(repoquery -q --location --latest-limit 1  "mariadb-connector
 dnf clean all
 rm -rf /var/cache/dnf
 
-pip3 install --retries=10 --timeout 200 --upgrade tox "setuptools==76.0" "lxml<5.1" jinja2 wheel pip2pi "chardet<5"
+pip3 install --retries=10 --timeout 200 --upgrade tox "lxml<5.1" jinja2 wheel pip2pi "chardet<5"
 
 # another strange thing with python3 - some paths are not in sys.path when script is called from spec file
 # so add them as a workaround to sys.path explicitely
