@@ -2,9 +2,6 @@ TF_DE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 TF_DE_TOP := $(abspath $(TF_DE_DIR)/../)/
 SHELL=/bin/bash -o pipefail
 
-# include RPM-building targets
--include $(TF_DE_TOP)contrail/tools/packages/Makefile
-
 REPODIR=$(TF_DE_TOP)contrail
 CONTAINER_BUILDER_DIR=$(REPODIR)/tf-container-builder
 CONTRAIL_TEST_DIR=$(REPODIR)/third_party/contrail-test
@@ -12,24 +9,23 @@ export REPODIR
 export CONTRAIL_TEST_DIR
 export CONTAINER_BUILDER_DIR
 
-all: dep rpm containers
+all: compile containers
+
+dep:
+	@$(REPODIR)/tools/build/dep.sh
+
+# TODO: pass /pip/ dir to compile.sh as a place to store built pip packages
+compile:
+	@$(REPODIR)/tools/build/compile.sh
 
 fetch_packages:
 	@$(TF_DE_DIR)scripts/fetch-packages.sh
-
-setup-boost:
-	@mkdir -p /root/work/build/include || true
-	@mkdir -p /root/work/build/lib || true
-	@ln -sf /usr/include/boost169/boost/ /root/work/build/include/boost
-	@ln -sf /usr/lib64/boost169/libboost_*.so* /root/work/build/lib/
-	@ln -sf /usr/lib64/boost169/libboost_.so.1.69.0 /root/work/build/lib/
-	@ln -sf /root/work/build/lib/libboost_python36.so /root/work/build/lib/libboost_python.so
 
 sync:
 	@$(TF_DE_DIR)scripts/sync-sources.sh
 
 ##############################################################################
-# RPM repo targets
+# RPM repo targets for TPP only
 create-repo:
 	@mkdir -p $(REPODIR)/RPMS
 	@createrepo --update $(REPODIR)/RPMS/
@@ -95,11 +91,11 @@ doxygen:
 clean-rpm:
 	@test -d $(REPODIR)/RPMS && rm -rf $(REPODIR)/RPMS/* || true
 
-clean: clean-deployers clean-containers clean-repo clean-rpm
-	@true
+clean: clean-deployers clean-containers clean-repo
+	@$(REPODIR)/tools/build/clean.sh
 
 dbg:
 	@echo $(TF_DE_TOP)
 	@echo $(TF_DE_DIR)
 
-.PHONY: clean-deployers clean-containers clean-repo clean-rpm setup build containers deployers createrepo all
+.PHONY: clean-deployers clean-containers clean-repo setup build containers deployers createrepo all

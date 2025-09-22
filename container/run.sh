@@ -75,32 +75,7 @@ function configure() {
     # targets can use yum and will block each other. don't run them in parallel
 
     echo "INFO: CONTRAIL_BRANCH=${CONTRAIL_BRANCH^^}"
-    if [[ ! "${CONTRAIL_BRANCH^^}" =~ 'R1912' && ! "${CONTRAIL_BRANCH^^}" =~ 'R2011' && ! "${CONTRAIL_BRANCH^^}" =~ 'R21.4' ]]; then
-        # install all python tools for build with python3 only
-        # after full switch of build to python3 - drop these tools from reqs in spec files
-        python3 -m pip install scons future lxml "Sphinx<7.3.0" requests setuptools "pyyaml<6"
-    fi
-
-    if [[ ! "${CONTRAIL_BRANCH^^}" =~ 'R24.1' && ! "${LINUX_DISTR}" == "rockylinux" ]]; then
-        yum -y install boost169 boost169-devel
-        yum -y remove boost boost-devel
-    fi
-
-    if [[ "${LINUX_DISTR}" == "rockylinux" ]]; then
-        # on rocky contrail-web-core requires coffee and livescript
-        # unlike centos7, js is not precompiled, so we install via npm and symlink
-        dnf -y install npm-1:8.19.4
-        npm install -g coffeescript livescript || true
-        ln -s /usr/local/bin/coffee /usr/bin/coffee || true
-        ln -s /usr/local/bin/lsc /usr/bin/lsc || true
-    fi
-
     local targets="$@"
-    ########## TODO: remove it !!!!!!!!!!!
-    if [[ -z "$targets" && "${LINUX_DISTR}" == "rockylinux" ]]; then
-        targets="tpp dep"
-    fi
-    ######################################
     [ -n "$targets" ] || targets="setup tpp dep"
 
     # frozen may have contrail repo set (e.g. if tpp changed)
@@ -108,9 +83,6 @@ function configure() {
     make setup-httpd
     if [[ "$targets" =~ 'setup' ]] ; then
         echo "INFO: make setup  $(date)"
-        if [[ ! "${CONTRAIL_BRANCH^^}" =~ 'R24.1' && ! "${LINUX_DISTR}" == "rockylinux" ]]; then
-            make setup-boost
-        fi
     fi
 
     if [[ "$targets" =~ 'tpp' ]] ; then
@@ -141,15 +113,14 @@ EOF
 
 function compile() {
     local targets="$@"
-    [ -n "$targets" ] || targets="tpp rpm"
+    [ -n "$targets" ] || targets="tpp compile"
 
     echo "INFO: compile: $targets"
     echo "INFO: Check variables used by makefile"
     uname -a
-    make info
 
     # frozen may have contrail repo set (e.g. if tpp changed)
-    # it is needed to have up rpm repo any stage that operates with yum
+    # it is needed to have up tpm/pip repos for any stage that operates with
     make setup-httpd
 
     # Remove information about FROZEN_TAG so that package stage doesn't try to use ready containers.
@@ -172,20 +143,18 @@ function compile() {
         echo "INFO: package tpp $(date)"
         # TODO: for now it does packaging for all rpms found in repo,
         # at this moment tpp packages are built only if there are changes there
-        # from gerrit. So, for now it relies on tha fact that it is first step of RPMs.
+        # from gerrit. So, for now it relies on that fact that it is first step of RPMs.
         make package-tpp
     fi
-    if [[ "$targets" =~ 'rpm' ]] ; then
+    if [[ "$targets" =~ 'compile' ]] ; then
         echo "INFO: CONTRAIL_BRANCH=${CONTRAIL_BRANCH^^}"
-        if [[ ! "${CONTRAIL_BRANCH^^}" =~ 'R1912' ]] && [[ ! "${CONTRAIL_BRANCH^^}" =~ 'R2011' ]]; then
-            if [ -e /opt/rh/devtoolset-7/enable ]; then
-                echo "INFO: enable /opt/rh/devtoolset-7/enable"
-                source /opt/rh/devtoolset-7/enable
-            fi
+        if [ -e /opt/rh/devtoolset-7/enable ]; then
+            echo "INFO: enable /opt/rh/devtoolset-7/enable"
+            source /opt/rh/devtoolset-7/enable
         fi
-        echo "INFO: make rpm  $(date)"
-        make rpm
-        echo "INFO: update rpm repo $(date)"
+        echo "INFO: make compile $(date)"
+        make compile
+        echo "INFO: update rpm/pip repos $(date)"
         make update-repo
     fi
 }
@@ -200,12 +169,11 @@ function package() {
     #Package everything
     echo "INFO: Check variables used by makefile"
     uname -a
-    make info
 
     set -x
 
     # frozen may have contrail repo set (e.g. if tpp changed)
-    # it is needed to have up rpm repo any stage that operates with yum
+    # it is needed to have up rpm/pip repos for any stage that operates with
     make setup-httpd
 
     # Check if we're packaging only a single target

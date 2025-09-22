@@ -14,10 +14,11 @@ dnf install -y langpacks-en glibc-all-langpacks dnf-utils
 dnf -y install \
   python3 iproute autoconf createrepo gdb git git-review jq libtool lsof \
   make cmake libuv-devel rpm-build vim wget docker-ce rsync procps-ng \
-  rpmdevtools sudo gcc-c++ net-tools httpd elfutils-libelf-devel \
+  sudo gcc gcc-c++ net-tools httpd elfutils-libelf-devel \
   python3-virtualenv python3-future python3-tox python3-devel python3-lxml \
-  doxygen graphviz python3-distro perl-diagnostics tbb openssl openssl-devel \
-  libcap-devel libnghttp2-devel boost boost-devel rapidjson-devel
+  python3-setuptools python3-distro perl-diagnostics tbb openssl openssl-devel \
+  libcap-devel libnghttp2-devel boost boost-devel rapidjson-devel \
+  doxygen graphviz bison flex
 
 # build automake 1.16.5 since rocky9 provides only 1.16.2
 # required for bind-9.21.3

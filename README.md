@@ -21,6 +21,10 @@ Recommended:
 
 ### 1. Preparation part
 
+For OpenSDN versions less that R25* and master please checkout branch "rpms".
+They use centos7 as a base OS and use rpm's style - build rpm packages after compile and install them in packaging stage.
+New way is to use built binaries/libs/files directly in packaging stage with "multistage" techology.
+
 Enable passwordless sudo for your user
 (for centos example: [serverfault page](https://serverfault.com/questions/160581/how-to-setup-passwordless-sudo-on-linux))
 
@@ -136,8 +140,8 @@ Supported targets:
 
 - fetch     - sync TF git repos
 - configure - fetch third party packages and install dependencies
-- compile   - build TF binaries (RPM-s)
-- package   - package TF into docker containers
+- compile   - build TF binaries
+- package   - package built binaries into docker containers
 - test      - run unittests
 
 ## Advanced usage
@@ -176,22 +180,18 @@ The descriptions of targets:
 
 ### 4. Building artifacts
 
-#### RPM packages
+#### compile packages
 
-- `make list` - lists all available RPM targets
-- `make rpm` - builds all RPMs
-- `make rpm-<pkg_name>` - builds single RPM for <pkg_name>
+- `make compile` - builds all binaries/libs/data files and put them into predefined dir tree to be able to use in container step
 
 #### Before containers build
 
-- `make create-repo` - creates repository with built RPMs
-- `make update-repo` - updates repository with built RPMs (in case when some RPM-s were rebuilt)
-- `make setup-httpd` - configures httpd for building images (can be run once after RPM's repository creation)
+- `make setup-httpd` - configures httpd for built pip packages
 
 #### Container images
 
 - `make list-containers` - lists all container targets
-- `make containers` - builds all containers' images, requires RPM packages in ~/contrail/RPMS and configured httpd
+- `make containers` - builds all containers' images
 - `make container-<container_name>` - builds single container as a target, with all docker dependencies
 
 #### Deployers
@@ -210,7 +210,7 @@ The descriptions of targets:
 
 #### Clean
 
-- `make clean{-containers,-deployers,-repo,-rpm}` - delete artefacts
+- `make clean{-containers,-deployers}` - delete artefacts
 
 #### Alternate build methods
 

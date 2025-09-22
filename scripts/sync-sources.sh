@@ -27,19 +27,7 @@ VNC_ORGANIZATION=${VNC_ORGANIZATION:-"opensdn-io"}
 VNC_REPO="tf-vnc"
 if [[ -n "$CONTRAIL_BRANCH" ]] ; then
   echo "INFO: CONTRAIL_BRANCH is not empty - $CONTRAIL_BRANCH"
-  # check branch in tf-vnc, then in contrail-vnc and then fallback to master branch in tf-vnc
-  if [[ $(curl -s https://api.github.com/repos/opensdn-io/tf-vnc/branches/${CONTRAIL_BRANCH} | jq -r '.name') != "${CONTRAIL_BRANCH}" ]]; then
-    # reset branch to master if no such branch in vnc.
-    # openshift-ansible, contrail-tripleo-puppet, contrail-trieplo-heat-templates do not
-    # depend on contrail branch and they are openstack depended.
-    echo "INFO: There is no $CONTRAIL_BRANCH branch in tf-vnc, use master"
-    echo "INFO: opensdn-io/tf-vnc answer"
-    curl -s https://api.github.com/repos/opensdn-io/tf-vnc/branches/${CONTRAIL_BRANCH}
-    CONTRAIL_BRANCH="master"
-    GERRIT_BRANCH=""
-  else
-    echo "INFO: using ${REPO_INIT_MANIFEST_URL}"
-  fi
+  echo "INFO: using ${REPO_INIT_MANIFEST_URL}"
 fi
 
 REPO_INIT_MANIFEST_BRANCH=${REPO_INIT_MANIFEST_BRANCH:-${CONTRAIL_BRANCH}}
