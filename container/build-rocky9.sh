@@ -12,7 +12,7 @@ fi
 dnf install -y langpacks-en glibc-all-langpacks dnf-utils
 
 dnf -y install \
-  python3 iproute autoconf createrepo gdb git git-review jq libtool \
+  python3 iproute autoconf createrepo gdb git git-review jq libtool lsof \
   make cmake libuv-devel rpm-build vim wget docker-ce rsync procps-ng \
   rpmdevtools sudo gcc-c++ net-tools httpd elfutils-libelf-devel \
   python3-virtualenv python3-future python3-tox python3-devel python3-lxml \
