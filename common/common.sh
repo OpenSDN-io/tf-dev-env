@@ -16,6 +16,9 @@ export TF_DEVENV_PROFILE="${TF_CONFIG_DIR}/dev.env"
 # Build mode allows skipping stages or targets after freeze if patchset is present - values full, fast
 export BUILD_MODE=${BUILD_MODE:-"full"}
 
+# folder with built binaries/libs/docs/data/... files from tf-dev-sandbox container which will be available during images build
+export BUILD_ROOT=${BUILD_ROOT:-'/buildroot'}
+
 [ -e "$TF_DEVENV_PROFILE" ] && source "$TF_DEVENV_PROFILE"
 
 # determined variables
