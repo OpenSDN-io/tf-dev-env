@@ -18,13 +18,13 @@ dnf repolist
 dnf install -y langpacks-en glibc-all-langpacks dnf-utils
 
 dnf -y install \
-  python3 iproute autoconf createrepo gdb git git-review jq libtool lsof \
-  make cmake libuv-devel rpm-build vim wget docker-ce rsync procps-ng \
+  python3 iproute autoconf gdb git git-review jq libtool lsof \
+  make cmake libuv-devel vim wget docker-ce rsync procps-ng \
   sudo gcc gcc-c++ net-tools httpd elfutils-libelf-devel \
   python3-virtualenv python3-future python3-tox python3-devel python3-lxml \
   python3-setuptools python3-distro perl-diagnostics tbb openssl openssl-devel \
   libcap-devel libnghttp2-devel boost boost-devel rapidjson-devel \
-  doxygen graphviz bison flex \
+  doxygen graphviz bison flex bzip2 patch unzip \
   userspace-rcu-devel
 
 # build automake 1.16.5 since rocky9 provides only 1.16.2
@@ -43,8 +43,8 @@ dnf -y install java-1.8.0-openjdk
 # this is for net-snmp packages (it is not possible to use BuildRequires in spec
 # as it installs openssl-devel-1.1.1 which is incompatible with other Contrail comps 
 # (3rd party bind and boost-1.53))
-rpm -ivh --nodeps $(repoquery -q --location --latest-limit 1  "mariadb-connector-c-3.*x86_64*"  | head -n 1)
-rpm -ivh --nodeps $(repoquery -q --location --latest-limit 1  "mariadb-connector-c-devel-3.*x86_64*"  | head -n 1)
+rpm -ivh --nodeps $(repoquery -q --location --latest-limit 1  "mariadb-connector-c-3.*x86_64*" | head -n 1)
+rpm -ivh --nodeps $(repoquery -q --location --latest-limit 1  "mariadb-connector-c-devel-3.*x86_64*" | head -n 1)
 
 dnf clean all
 rm -rf /var/cache/dnf

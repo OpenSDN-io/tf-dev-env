@@ -13,10 +13,6 @@ fi
 
 export CONTRAIL_REGISTRY
 
-if [[ -z "${CONTRAIL_REPOSITORY}" ]]; then
-  echo "CONTRAIL_REPOSITORY is not set" && exit 1
-fi
-
 export CONTRAIL_CONTAINER_TAG=${CONTRAIL_CONTAINER_TAG:-"dev"}
 openstack_version="train"
 CONTRAIL_KEEP_LOG_FILES=${CONTRAIL_KEEP_LOG_FILES:-'false'}
@@ -36,32 +32,23 @@ function append_log() {
 }
 
 function build_for_os_version() {
-    local openstack_version=$1
-    local logfile="./build-test-${openstack_version}.log"
-    local openstack_repo_option=""
-    if [[ ! -z "${OPENSTACK_REPOSITORY}" ]]; then
-        echo Using openstack repository ${OPENSTACK_REPOSITORY}/openstack-${openstack_version}
-        openstack_repo_option="--openstack-repo ${OPENSTACK_REPOSITORY}/openstack-${openstack_version}"
-    fi
+  local openstack_version=$1
+  local logfile="./build-test-${openstack_version}.log"
 
-    echo "INFO: Start build test container for ${openstack_version}" | append_log $logfile true
-    ./build-container.sh test \
-        --base-tag ${CONTRAIL_CONTAINER_TAG} \
-        --tag ${CONTRAIL_CONTAINER_TAG} \
-        --registry-server ${CONTRAIL_REGISTRY} \
-        --sku ${openstack_version} \
-        --contrail-repo ${CONTRAIL_REPOSITORY} \
-        ${openstack_repo_option} \
-        --post | append_log $logfile
+  echo "INFO: Start build test container for ${openstack_version}" | append_log $logfile true
+  ./build-container.sh test \
+    --tag ${CONTRAIL_CONTAINER_TAG} \
+    --registry-server ${CONTRAIL_REGISTRY} \
+    --post | append_log $logfile
 
-    local res=${PIPESTATUS[0]}
-    if [ $res -eq 0 ]; then
-      echo "INFO: Build test container for ${openstack_version} finished successfully" | append_log $logfile true
-      [[ "${CONTRAIL_KEEP_LOG_FILES,,}" != 'true' ]] && rm -f $logfile
-    else
-      echo "ERROR: Faild to build test container for ${openstack_version}" | append_log $logfile true
-    fi
-    return $res
+  local res=${PIPESTATUS[0]}
+  if [ $res -eq 0 ]; then
+    echo "INFO: Build test container for ${openstack_version} finished successfully" | append_log $logfile true
+    [[ "${CONTRAIL_KEEP_LOG_FILES,,}" != 'true' ]] && rm -f $logfile
+  else
+    echo "ERROR: Failed to build test container for ${openstack_version}" | append_log $logfile true
+  fi
+  return $res
 }
 
 res=0

@@ -73,107 +73,40 @@ function fetch() {
 
 function configure() {
     # targets can use yum and will block each other. don't run them in parallel
-
     echo "INFO: CONTRAIL_BRANCH=${CONTRAIL_BRANCH^^}"
-    local targets="$@"
-    [ -n "$targets" ] || targets="setup tpp dep"
-
-    # frozen may have contrail repo set (e.g. if tpp changed)
-    # it is needed to have up rpm repo any stage that operates with yum
-    make setup-httpd
-    if [[ "$targets" =~ 'setup' ]] ; then
-        echo "INFO: make setup  $(date)"
-    fi
-
-    if [[ "$targets" =~ 'tpp' ]] ; then
-        if [[ "$targets" == 'tpp' ]] ; then 
-            export BUILD_TPP_FORCE='true'
-        fi
-        echo "INFO: make fetch_packages $(date)"
-        make fetch_packages
-    fi
-
-    if [[ "$targets" =~ 'dep' ]] ; then
-        echo "INFO: make dep $(date)"
-        make dep
-    fi
-
-    # disable byte compiling
-    if [[ ! -f /usr/lib/rpm/brp-python-bytecompile.org  ]] ; then
-        echo "INFO: disable byte compiling for python"
-        mv /usr/lib/rpm/brp-python-bytecompile /usr/lib/rpm/brp-python-bytecompile.org
-        cat <<EOF | tee /usr/lib/rpm/brp-python-bytecompile
-#!/bin/bash
-# disabled byte compiling
-exit 0
-EOF
-        chmod +x /usr/lib/rpm/brp-python-bytecompile
-    fi
+    echo "INFO: make fetch_packages $(date)"
+    make fetch_packages
+    echo "INFO: make dep $(date)"
+    make dep
 }
 
 function compile() {
-    local targets="$@"
-    [ -n "$targets" ] || targets="tpp compile"
-
-    echo "INFO: compile: $targets"
-    echo "INFO: Check variables used by makefile"
-    uname -a
-
-    # frozen may have contrail repo set (e.g. if tpp changed)
-    # it is needed to have up tpm/pip repos for any stage that operates with
-    make setup-httpd
+    echo "INFO: CONTRAIL_BRANCH=${CONTRAIL_BRANCH^^}"
+    echo "INFO: compile: $targets  $(date)"
 
     # Remove information about FROZEN_TAG so that package stage doesn't try to use ready containers.
     export FROZEN_TAG=""
     save_tf_devenv_profile
 
-    echo "INFO: create rpm repo $(date)"
-    # remove all built rpm-s if stage is compile - otherwise package may take newer files from frozen container
-    rm -rf $WORK_DIR/RPMS/*
-
-    make create-repo
-    if [[ "$targets" =~ 'tpp' ]] ; then
-        if [[ "$targets" == 'tpp' ]] ; then 
-            export BUILD_TPP_FORCE='true'
-        fi
-        echo "INFO: make tpp $(date)"
-        make build-tpp
-        echo "INFO: update rpm repo $(date)"
-        make update-repo
-        echo "INFO: package tpp $(date)"
-        # TODO: for now it does packaging for all rpms found in repo,
-        # at this moment tpp packages are built only if there are changes there
-        # from gerrit. So, for now it relies on that fact that it is first step of RPMs.
-        make package-tpp
+    echo "INFO: CONTRAIL_BRANCH=${CONTRAIL_BRANCH^^}"
+    if [ -e /opt/rh/devtoolset-7/enable ]; then
+        echo "INFO: enable /opt/rh/devtoolset-7/enable"
+        source /opt/rh/devtoolset-7/enable
     fi
-    if [[ "$targets" =~ 'compile' ]] ; then
-        echo "INFO: CONTRAIL_BRANCH=${CONTRAIL_BRANCH^^}"
-        if [ -e /opt/rh/devtoolset-7/enable ]; then
-            echo "INFO: enable /opt/rh/devtoolset-7/enable"
-            source /opt/rh/devtoolset-7/enable
-        fi
-        echo "INFO: make compile $(date)"
-        make compile
-        echo "INFO: update rpm/pip repos $(date)"
-        make update-repo
-    fi
+    echo "INFO: make compile $(date)"
+    make compile
+    dir2pi /pip/
 }
 
 function test() {
-    echo "INFO: Starting unit tests"
-    uname -a
+    echo "INFO: Starting unit tests  $(date)"
     TEST_PACKAGE=$1 make test
 }
 
 function package() {
-    #Package everything
-    echo "INFO: Check variables used by makefile"
-    uname -a
+    echo "INFO: Start packaging  $(date)"
 
-    set -x
-
-    # frozen may have contrail repo set (e.g. if tpp changed)
-    # it is needed to have up rpm/pip repos for any stage that operates with
+    # set up httpd repo with pip packages to able to use them in images build
     make setup-httpd
 
     # Check if we're packaging only a single target

@@ -25,29 +25,9 @@ sync:
 	@$(TF_DE_DIR)scripts/sync-sources.sh
 
 ##############################################################################
-# RPM repo targets for TPP only
-create-repo:
-	@mkdir -p $(REPODIR)/RPMS
-	@createrepo --update $(REPODIR)/RPMS/
-	@dir2pi /pip/
-	@echo "INFO: clean all for contrail repo after udpate"
-	@yum clean all --disablerepo=* --enablerepo=contrail || true
-
-update-repo: create-repo
-
-clean-repo:
-	@test -d $(REPODIR)/RPMS/repodata && rm -rf $(REPODIR)/RPMS/repodata || true
-
+# set up http for pip repository
 setup-httpd:
 	@$(TF_DE_DIR)scripts/setup-httpd.sh
-
-##############################################################################
-# Contrail third party packaged
-build-tpp:
-	@$(TF_DE_DIR)scripts/build-tpp.sh
-
-package-tpp:
-	@$(TF_DE_DIR)scripts/package-tpp.sh
 
 ##############################################################################
 # Container deployer-src targets
@@ -88,14 +68,11 @@ doxygen:
 
 ##############################################################################
 # Other clean targets
-clean-rpm:
-	@test -d $(REPODIR)/RPMS && rm -rf $(REPODIR)/RPMS/* || true
-
-clean: clean-deployers clean-containers clean-repo
+clean: clean-deployers clean-containers
 	@$(REPODIR)/tools/build/clean.sh
 
 dbg:
 	@echo $(TF_DE_TOP)
 	@echo $(TF_DE_DIR)
 
-.PHONY: clean-deployers clean-containers clean-repo setup build containers deployers createrepo all
+.PHONY: clean-deployers clean-containers setup build containers deployers all
