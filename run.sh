@@ -71,6 +71,10 @@ if ! is_container_created "$DEVENV_CONTAINER_NAME"; then
     devenv_image="$FROZEN_REGISTRY/$DEVENV_IMAGE_NAME:frozen"
   fi
 
+  if [[ "$CONTRAIL_BRANCH" == "R24.1" ]]; then
+    export BUILD_DEVDEV_ENV=1
+  fi
+
   if [[ "$BUILD_DEVDEV_ENV" != '1' ]] && ! is_container_created ${devenv_image} ; then
     if ! mysudo docker inspect $devenv_image >/dev/null 2>&1 && ! mysudo docker pull $devenv_image ; then
       if [[ "$BUILD_DEV_ENV_ON_PULL_FAIL" != '1' ]]; then
