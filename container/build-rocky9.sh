@@ -14,6 +14,11 @@ dnf install -y 'dnf-command(config-manager)'
 dnf config-manager --set-enabled crb || /bin/true
 dnf repolist
 
+if ! dnf info docker-ce ; then
+  echo "INFO: adding docker repo from upstream"
+  dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+fi
+
 # to fix locale warning and to enable following cmd
 dnf install -y langpacks-en glibc-all-langpacks dnf-utils
 

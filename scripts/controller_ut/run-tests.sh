@@ -19,8 +19,6 @@ mkdir -p "$dump_path"
 bash -c 'echo "127.0.0.1 localhost" > /etc/hosts'
 bash -c 'echo "::1 localhost" >> /etc/hosts'
 
-unset BUILD_ONLY
-
 # pip==20.3.1 has issues with installing packages. looks like new resolver is broken for python3.6
 # let's pin old version to avoid such issues
 export VIRTUALENV_PIP="20.2"
