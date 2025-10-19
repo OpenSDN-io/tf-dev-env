@@ -82,7 +82,7 @@ else
   if [[ -n "$vnc_changes" ]] ; then
     # clone from GERRIT_URL cause this is taken from patchsets
     vnc_branch=$(echo "$vnc_changes" | head -n 1 | awk '{print($3)}')
-    # '
+    # comment to restore syntax highlight in mc '
     rm -rf ${VNC_REPO}
     cmd="git clone --depth=1 --single-branch -b $vnc_branch ${GERRIT_URL}${VNC_ORGANIZATION}/${VNC_REPO} ${VNC_REPO}"
     echo "INFO: $cmd"
@@ -190,6 +190,10 @@ if [ -e "$patchsets_info_file" ] ; then
         fi
       fi
       popd
+      if [[ "$repo_project" == 'tf-build' ]]; then
+          # this file is placed by manifest into several places. So copy it everywhere after applying a patch
+          cp -f tools/build/SConstruct SConstruct
+      fi
     done <<< "$repo_projects"
   done
   [[ $? != 0 ]] && exit 1
