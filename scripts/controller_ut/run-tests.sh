@@ -51,12 +51,25 @@ echo ; echo
 for utest in $(cat "$targets_file") ; do
   echo "INFO: $(date) Starting unit tests for target $utest"
   logfilename="$(echo $utest | cut -f 1 -d ':' | rev | cut -f 1 -d '/' | rev).log"
-  if ! timeout $TARGET_TIMEOUT "$scriptdir/run-tests.py" --less-strict -j $JOBS --skip-tests $DEV_ENV_ROOT/skip_tests $utest &> $logs_path/$logfilename ; then
+
+  if [[ "$utest" == 'controller/src/agent:test' ]]; then
+    # run these tests with old runner which restarts only failed targets.
+    # tests are very unstable for simple run
+    cmd="$scriptdir/run-tests.py --less-strict -j $JOBS --skip-tests $DEV_ENV_ROOT/skip_tests"
+  else
+    # use simple runner. without any analyzing after run
+    cmd="scons -j $JOBS --keep-going --skip-tests=$DEV_ENV_ROOT/skip_tests"
+  fi
+  echo "$cmd" > $logs_path/$logfilename
+
+  if ! timeout $TARGET_TIMEOUT $cmd $utest &>> $logs_path/$logfilename ; then
     res=1
     echo "ERROR: $utest failed"
   fi
   echo "INFO: $(date) Unit test log is available at $logs_path/$logfilename"
 done
+
+printf "\n\n"
 
 function process_file() {
   local src_file=$1
@@ -64,11 +77,26 @@ function process_file() {
   if [[ "$src_file" == 'null' ]]; then
     return
   fi
-  for file in $(ls -1 ${src_file%.${ext}}.*.${ext} 2>/dev/null) ; do
+  local ldir=''
+  local dst_file
+  local file
+  for file in $(ls -1 ${src_file%.${ext}}.*${ext} 2>/dev/null) ; do
+    echo "INFO: found log file $file"
+    ldir=$(dirname $file)
     dst_file=$(echo $file | sed "s~$HOME/contrail~$logs_path~g")
     mkdir -p $(dirname $dst_file)
     cp $file $dst_file
   done
+  if [[ -n "$ldir" ]]; then
+    local count=0
+    for file in $(find $ldir -name '*.log' ! -size 0) ; do
+      local ddir=$logs_path/$(dirname ${src_file#/root/contrail/})
+      mkdir -p $ddir
+      mv $file $ddir
+      ((count+=1))
+    done
+    echo "INFO: moved $count log files"
+  fi
 }
 
 # gather scons logs
@@ -77,6 +105,7 @@ if [[ -n "$target_set" ]] ; then test_list+=".$target_set" ; fi
 scons -Q --warn=no-all --describe-tests $(cat $targets_file | tr '\n' ' ') > $test_list
 while IFS= read -r line
 do
+  echo "INFO: process line $line"
   process_file "$(echo $line | jq -r ".log_path" 2>/dev/null)" 'log'
   process_file "$(echo $line | jq -r ".xml_path" 2>/dev/null)" 'xml'
 done < "$test_list"

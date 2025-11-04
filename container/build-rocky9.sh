@@ -30,7 +30,8 @@ dnf -y install \
   python3-setuptools python3-distro perl-diagnostics tbb openssl openssl-devel \
   libcap-devel libnghttp2-devel boost boost-devel rapidjson-devel \
   doxygen graphviz bison flex bzip2 patch unzip userspace-rcu-devel \
-  gperftools-libs gperftools-devel rapidjson-devel hiredis-devel
+  gperftools-libs gperftools-devel rapidjson-devel hiredis-devel \
+  subunit-filters
 
 # build automake 1.16.5 since rocky9 provides only 1.16.2
 # required for bind-9.21.3
