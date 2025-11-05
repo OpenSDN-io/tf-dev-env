@@ -52,8 +52,12 @@ for utest in $(cat "$targets_file") ; do
   echo "INFO: $(date) Starting unit tests for target $utest"
   logfilename="$(echo $utest | cut -f 1 -d ':' | rev | cut -f 1 -d '/' | rev).log"
 
-  if [[ "$utest" == 'controller/src/agent:test' || "$utest" == 'src/contrail-analytics/contrail-collector:test' ]]; then
-    # run these tests with old runner which restarts only failed targets.
+  if [[ "$utest" == 'controller/src/agent:test'
+    || "$utest" == 'src/contrail-analytics/contrail-collector:test'
+    || "$utest" == 'controller/src/bgp:test'
+    || "$utest" == 'controller/src/xmpp:test'
+    || "$utest" == 'src/contrail-common/io:test' ]]; then
+    # run these tests with old runner which restarts only failed tests.
     # tests are very unstable for simple run
     cmd="$scriptdir/run-tests.py --less-strict -j $JOBS --skip-tests $DEV_ENV_ROOT/skip_tests"
   else
