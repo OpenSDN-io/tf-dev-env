@@ -52,7 +52,7 @@ for utest in $(cat "$targets_file") ; do
   echo "INFO: $(date) Starting unit tests for target $utest"
   logfilename="$(echo $utest | cut -f 1 -d ':' | rev | cut -f 1 -d '/' | rev).log"
 
-  if [[ "$utest" == 'controller/src/agent:test' ]]; then
+  if [[ "$utest" == 'controller/src/agent:test' || "$utest" == 'src/contrail-analytics/contrail-collector:test' ]]; then
     # run these tests with old runner which restarts only failed targets.
     # tests are very unstable for simple run
     cmd="$scriptdir/run-tests.py --less-strict -j $JOBS --skip-tests $DEV_ENV_ROOT/skip_tests"
@@ -60,7 +60,7 @@ for utest in $(cat "$targets_file") ; do
     # use simple runner. without any analyzing after run
     cmd="scons -j $JOBS --keep-going --skip-tests=$DEV_ENV_ROOT/skip_tests"
   fi
-  echo "$cmd" > $logs_path/$logfilename
+  echo "$cmd $utest" > $logs_path/$logfilename
 
   if ! timeout $TARGET_TIMEOUT $cmd $utest &>> $logs_path/$logfilename ; then
     res=1
