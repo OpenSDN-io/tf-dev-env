@@ -55,6 +55,7 @@ for utest in $(cat "$targets_file") ; do
   if [[ "$utest" == 'controller/src/agent:test'
     || "$utest" == 'src/contrail-analytics/contrail-collector:test'
     || "$utest" == 'controller/src/bgp:test'
+    || "$utest" == 'controller/src/bfd:test'
     || "$utest" == 'controller/src/xmpp:test'
     || "$utest" == 'src/contrail-common/io:test' ]]; then
     # run these tests with old runner which restarts only failed tests.
