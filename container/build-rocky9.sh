@@ -24,7 +24,7 @@ dnf install -y langpacks-en glibc-all-langpacks dnf-utils
 
 dnf -y install \
   python3 iproute autoconf gdb git git-review jq libtool lsof \
-  make cmake libuv-devel vim wget docker-ce rsync procps-ng \
+  make cmake libuv-devel vim wget 'docker-ce-3:28.*' rsync procps-ng \
   sudo gcc gcc-c++ net-tools httpd elfutils-libelf-devel \
   python3-virtualenv python3-future python3-tox python3-devel python3-lxml \
   python3-setuptools python3-distro perl-diagnostics tbb openssl openssl-devel \
