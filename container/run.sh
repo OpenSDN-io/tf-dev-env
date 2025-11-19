@@ -96,6 +96,8 @@ function compile() {
     echo "INFO: make compile $(date)"
     make compile
     dir2pi /pip/
+    docker commit $DEVENV_CONTAINER_NAME ${DEVENV_IMAGE_NAME}:compile
+    docker images
 }
 
 function test() {
