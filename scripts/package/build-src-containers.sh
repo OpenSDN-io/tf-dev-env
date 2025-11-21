@@ -53,7 +53,7 @@ if ! [[ "$dirname" =~ ^\#.*$ ]] ; then
   fi
 
   imagename=$dirname
-  if [[ "${CONTRAIL_BRANCH,,}" =~ 'master' ]]; then
+  if [[ "${CONTRAIL_BRANCH,,}" =~ 'master' || "${CONTRAIL_BRANCH,,}" =~ '25.1' ]]; then
     imagename="$(echo $dirname | sed 's/^tf/opensdn/')-src"
   fi
   echo "INFO: Pack $dirname sources to container ${imagename} ${buildsh}"
