@@ -11,6 +11,7 @@ mkdir -p $CACHE_DIR || true
 pushd $CACHE_DIR
 
 wget -nv -t3 -P go https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz
+wget -nv -t3 -P gnu/automake https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz
 
 # commented because URL-s are unavailable
 #wget -nv -t3 -P el8/extras/x86_64 https://pkgs.dyn.su/el8/extras/x86_64/compat-openssl10-devel-1.0.2o-3.el8.x86_64.rpm
