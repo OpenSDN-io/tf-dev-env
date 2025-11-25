@@ -93,6 +93,10 @@ function compile() {
         echo "INFO: enable /opt/rh/devtoolset-7/enable"
         source /opt/rh/devtoolset-7/enable
     fi
+    if docker inspect ${DEVENV_IMAGE_NAME}:compile > /dev/null 2>&1 ; then
+        # delete image if already exists
+        docker rmi ${DEVENV_IMAGE_NAME}:compile
+    fi
     echo "INFO: make compile $(date)"
     make compile
     dir2pi /pip/
