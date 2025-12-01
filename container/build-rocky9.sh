@@ -36,7 +36,7 @@ dnf -y install \
 # build automake 1.16.5 since rocky9 provides only 1.16.2
 # required for bind-9.21.3
 cd /usr/local/src
-wget https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz
+wget -nv ${SITE_MIRROR:-"https://ftp.gnu.org"}/gnu/automake/automake-1.16.5.tar.gz
 tar -xzf automake-1.16.5.tar.gz
 cd automake-1.16.5
 ./configure --prefix=/usr/local
