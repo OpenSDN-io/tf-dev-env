@@ -20,9 +20,9 @@ cd $DEV_ENV_ROOT
 
 [ -n "$DEBUG" ] && set -x
 
-declare -a all_stages=(fetch configure compile package test freeze doxygen)
+declare -a all_stages=(fetch configure compile package test freeze doxygen publish)
 declare -a default_stages=(fetch configure)
-declare -a build_stages=(fetch configure compile package)
+declare -a build_stages=(fetch configure compile package publish)
 
 function fetch() {
     verify_tag=$(get_current_container_tag)
@@ -199,6 +199,50 @@ function doxygen() {
     else
         echo "INFO: Doxygen stage: Cannot find the Doxygen file ($DOXYFILE)"
     fi
+}
+
+function publish() {
+    echo "INFO: Start publish $(date)"
+
+    if [[ -z "$OPENSDN_REGISTRY_PUSH" ]]; then
+        echo "INFO: OPENSDN_REGISTRY_PUSH is not set. Skipping publish stage."
+        return 0
+    fi
+
+    if [[ -n "$OPENSDN_REGISTRY_USERNAME" ]] && [[ -n "$OPENSDN_REGISTRY_PASSWORD" ]]; then
+        echo "INFO: Logging in to registry $OPENSDN_REGISTRY_PUSH"
+        echo "$OPENSDN_REGISTRY_PASSWORD" | docker login "$OPENSDN_REGISTRY_PUSH" -u "$OPENSDN_REGISTRY_USERNAME" --password-stdin
+    fi
+
+    echo "INFO: Pushing images to $OPENSDN_REGISTRY_PUSH"
+
+    # Find all images with the current CONTRAIL_CONTAINER_TAG and CONTRAIL_REGISTRY prefix
+    local images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "^${CONTRAIL_REGISTRY}/.*:${CONTRAIL_CONTAINER_TAG}$")
+
+    if [[ -z "$images" ]]; then
+        echo "WARNING: No images found to push matching ${CONTRAIL_REGISTRY}/*:${CONTRAIL_CONTAINER_TAG}"
+        return 0
+    fi
+
+    for img in $images; do
+        # Extract container name (remove registry prefix and tag)
+        # img format: registry/container_name:tag
+        local repo_tag=${img#${CONTRAIL_REGISTRY}/} # container_name:tag
+        local container_name=${repo_tag%:${CONTRAIL_CONTAINER_TAG}} # container_name
+
+        local target_image="${OPENSDN_REGISTRY_PUSH}/${container_name}:${CONTRAIL_CONTAINER_TAG}"
+
+        echo "INFO: Tagging $img as $target_image"
+        docker tag "$img" "$target_image"
+
+        echo "INFO: Pushing $target_image"
+        if ! docker push "$target_image"; then
+            echo "ERROR: Failed to push $target_image"
+            return 1
+        fi
+    done
+
+    echo "INFO: Publish finished successfully $(date)"
 }
 
 

@@ -177,7 +177,7 @@ if [[ $result == 0 ]] ; then
   echo
   echo '[DONE]'
   echo "There are stages available to run ./run.sh <stage>:"
-  echo "  build     - perform sequence of stages: fetch, configure, compile, package"
+  echo "  build     - perform sequence of stages: fetch, configure, compile, package, publish (if configured)"
   echo "              (if stage was run previously it be skipped)"
   echo "  fetch     - sync TF git repos"
   echo "  configure - fetch third party packages and install dependencies"
@@ -186,6 +186,7 @@ if [[ $result == 0 ]] ; then
   echo "  test      - run unittests"
   echo "  freeze    - prepare tf-dev-env for pushing to container registry for future reuse by compressing contrail directory"
   echo "  upload    - push tf-dev-env to container registry"
+  echo "  publish   - push built containers to custom registry (requires OPENSDN_REGISTRY_PUSH)"
   echo "  none      - create the tf-dev-env container empty"
   echo "  frozen    - fetch frozen tf-dev-env from Ci registry, you still have to use run.sh or fetch/configure to get sources"
   echo "  doxygen   - builds doxygen documentation for the project"
