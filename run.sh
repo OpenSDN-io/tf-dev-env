@@ -174,6 +174,13 @@ if [[ "$BIND_CONTRAIL_DIR" != 'false' ]] ; then
 fi
 
 if [[ $result == 0 ]] ; then
+  if [[ "$stage" == 'compile' ]] ; then
+    if ! mysudo docker inspect ${DEVENV_IMAGE_NAME}:compile > /dev/null 2>&1 ; then
+      # commit state to be able to use it in next stage as an external layer
+      mysudo docker commit $DEVENV_CONTAINER_NAME ${DEVENV_IMAGE_NAME}:compile
+    fi
+    mysudo docker images
+  fi
   echo
   echo '[DONE]'
   echo "There are stages available to run ./run.sh <stage>:"
