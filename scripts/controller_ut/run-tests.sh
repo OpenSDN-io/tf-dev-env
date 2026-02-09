@@ -23,6 +23,9 @@ bash -c 'echo "::1 localhost" >> /etc/hosts'
 # let's pin old version to avoid such issues
 export VIRTUALENV_PIP="20.2"
 
+# to print leaks info
+export PPROF_PATH=$(which pprof)
+
 echo "INFO: Prepare targets $(date)"
 targets_file="/input/unittest_targets.lst"
 if [[ ! -f "$targets_file" || -n "$TARGET" ]] ; then
