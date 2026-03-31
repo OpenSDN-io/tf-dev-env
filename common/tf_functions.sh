@@ -15,6 +15,7 @@ function create_env_file() {
 set -m
 export DEBUG=${DEBUG}
 export DEBUGINFO=${DEBUGINFO}
+export CODE_COVERAGE=${CODE_COVERAGE:-FALSE}
 export LINUX_DISTR=${LINUX_DISTR}
 export LINUX_DISTR_VER=${LINUX_DISTR_VER}
 export BUILD_MODE=${BUILD_MODE}
@@ -48,6 +49,14 @@ EOF
   fi
   if [[ -n "$GERRIT_PROJECT" ]]; then
     echo "export GERRIT_PROJECT=${GERRIT_PROJECT}" >> $container_env_file
+  fi
+
+  # Jenkins logs host (merge-coverage downloads per-job *.info.gz via HTTP).
+  if [[ -n "${LOGS_URL:-}" ]]; then
+    echo "export LOGS_URL=${LOGS_URL}" >> $container_env_file
+  fi
+  if [[ -n "${STREAM:-}" ]]; then
+    echo "export STREAM=${STREAM}" >> $container_env_file
   fi
 }
 

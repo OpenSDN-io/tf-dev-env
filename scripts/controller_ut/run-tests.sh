@@ -43,6 +43,11 @@ if [ -e /input/target_set ]; then
   target_set=$(cat /input/target_set)
 fi
 
+cov=''
+if [[ "${CODE_COVERAGE^^}" == "TRUE" ]]; then
+  cov='--coverage'
+fi
+
 res=0
 echo "INFO: enable core dumps"
 ulimit -c unlimited
@@ -51,6 +56,7 @@ echo "$dump_path/core-%i-%p-%E" > /proc/sys/kernel/core_pattern
 echo "INFO: targets to run:"
 cat "$targets_file"
 echo ; echo
+
 for utest in $(cat "$targets_file") ; do
   echo "INFO: $(date) Starting unit tests for target $utest"
   logfilename="$(echo $utest | cut -f 1 -d ':' | rev | cut -f 1 -d '/' | rev).log"
@@ -63,10 +69,10 @@ for utest in $(cat "$targets_file") ; do
     || "$utest" == 'src/contrail-common/io:test' ]]; then
     # run these tests with old runner which restarts only failed tests.
     # tests are very unstable for simple run
-    cmd="$scriptdir/run-tests.py --less-strict -j $JOBS --skip-tests $DEV_ENV_ROOT/skip_tests"
+    cmd="$scriptdir/run-tests.py --less-strict $cov -j $JOBS --skip-tests $DEV_ENV_ROOT/skip_tests"
   else
     # use simple runner. without any analyzing after run
-    cmd="scons -j $JOBS --keep-going --skip-tests=$DEV_ENV_ROOT/skip_tests"
+    cmd="scons -j $JOBS --keep-going --skip-tests=$DEV_ENV_ROOT/skip_tests $cov"
   fi
   echo "$cmd $utest" > $logs_path/$logfilename
 
@@ -139,12 +145,27 @@ for file in $(find build/ -name '*.log' ! -size 0) ; do
   cp -u $file $logs_path/$file
 done
 
-# gzip .log files - they consume several Gb unpacked
+if [[ -n "$cov" ]]; then
+  $scriptdir/collect-coverage.sh || res=1
+  # rename coverage.info to coverage.<target_set>.info
+  if [[ -n "${target_set:-}" ]]; then
+    mkdir -p "$logs_path/coverage"
+    cov_named="$logs_path/coverage/coverage.${target_set}.info"
+    if [[ -s "$logs_path/coverage/coverage.info" ]]; then
+      cp -f "$logs_path/coverage/coverage.info" "$cov_named"
+    else
+      touch $cov_named
+    fi
+    gzip -f $cov_named
+  fi
+fi
+
+# gzip .log under logs_path — large on disk (lcov.log, test logs)
 pushd $logs_path
 time find $(pwd) -name '*.log' | xargs gzip
 popd
 
 if [[ "$res" != '0' ]]; then
-  echo "ERROR: some UT failed"
+  echo "ERROR: some UT and/or coverage failed"
 fi
 exit $res

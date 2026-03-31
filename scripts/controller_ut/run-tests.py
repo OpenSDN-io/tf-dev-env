@@ -62,6 +62,7 @@ class TungstenTestRunner(object):
         parser.add_argument("--less-strict", dest="strict", action="store_false")
         parser.add_argument("--skip-tests", dest="skip_tests", action="store")
         parser.add_argument("-j", help="Allow N jobs at once for scons run.", dest="job_count", type=int)
+        parser.add_argument("--coverage", dest="coverage", action="store_true")
         parser.add_argument("targets", type=str, nargs="+")
 
         self.args = parser.parse_args()
@@ -83,6 +84,11 @@ class TungstenTestRunner(object):
                 args = '--skip-tests=' + str(self.args.skip_tests)
                 break
         return args
+
+    def _coverage_args(self):
+        if self.args.coverage:
+            return "--coverage"
+        return ""
 
     def describe_tests(self):
         logging.info("Gathering tests for the following targets: %s", (self.args.targets))
@@ -110,7 +116,7 @@ class TungstenTestRunner(object):
             args += ['--kernel-dir=/lib/modules/{}/build'.format(scons_env['KVERS'])]
         if not self.args.strict:
             scons_env['NO_HEAPCHECK'] = '1'
-        command = [shutil.which("scons"), "-j", str(self.args.job_count), "--keep-going", self._skip_tests_args()] + args + targets
+        command = [shutil.which("scons"), "-j", str(self.args.job_count), "--keep-going", self._skip_tests_args(), self._coverage_args()] + args + targets
         logging.info("Executing SCons command: %s", " ".join(command))
         rc = subprocess.call(command, env=scons_env)
         return rc, targets

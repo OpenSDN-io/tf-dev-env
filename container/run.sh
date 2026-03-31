@@ -109,6 +109,12 @@ function test() {
     TEST_PACKAGE=$1 make test
 }
 
+function merge_coverage() {
+    echo "INFO: merge_coverage (lcov merge) $(date)"
+    mkdir -p /in /out "/output/logs/coverage"
+    ./scripts/controller_ut/merge-ut-coverage.sh
+}
+
 function package() {
     echo "INFO: Start packaging  $(date)"
 

@@ -7,6 +7,9 @@ set -o errexit
 # Should be set to TRUE to produce debuginfo
 export DEBUGINFO=${DEBUGINFO:-FALSE}
 
+# add CODE_COVERAGE to unit tests
+export CODE_COVERAGE=${CODE_COVERAGE:-FALSE}
+
 # working environment
 # WORKSPACE and two next vars are applicable only outside of sandbox container - on host.
 export WORKSPACE=${WORKSPACE:-$(pwd)}
