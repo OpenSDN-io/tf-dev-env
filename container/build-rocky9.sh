@@ -68,7 +68,10 @@ rm -f go1.23.4.linux-amd64.tar.gz
 echo export PATH=$PATH:/usr/local/go/bin >> $HOME/.bashrc
 
 # install, customize and configure compat ssl 1.0.2o
-rpm -ivh https://pkgs.sysadmins.ws/el9/base/x86_64/raven-release.el9.noarch.rpm
+mkdir -p /tmp/raven-release
+wget -nv --tries=3 -c -P /tmp/raven-release ${SITE_MIRROR:-"https://pkgs.sysadmins.ws"}/el9/base/x86_64/raven-release.el9.noarch.rpm
+rpm -ivh /tmp/raven-release/raven-release.el9.noarch.rpm
+rm -f /tmp/raven-release/raven-release.el9.noarch.rpm
 
 OPENSSL_ROOT_DIR=/usr/local/ssl
 echo export OPENSSL_ROOT_DIR=/usr/local/ssl >> $HOME/.bashrc
