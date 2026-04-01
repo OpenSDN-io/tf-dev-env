@@ -73,6 +73,12 @@ wget -nv --tries=3 -c -P /tmp/raven-release ${SITE_MIRROR:-"https://pkgs.sysadmi
 rpm -ivh /tmp/raven-release/raven-release.el9.noarch.rpm
 rm -f /tmp/raven-release/raven-release.el9.noarch.rpm
 
+# raven-release ships only /etc/yum.repos.d/raven.repo (raven, raven-modular, …). TLS on pkgs.sysadmins.ws
+# can be expired; add sslverify=0 in-repo (per stanza, after baseurl) so dnf/libcurl picks it up.
+if [[ -f /etc/yum.repos.d/raven.repo ]]; then
+  sed -i '/^baseurl=https:\/\/pkgs\.sysadmins\.ws/a sslverify=0' /etc/yum.repos.d/raven.repo
+fi
+
 OPENSSL_ROOT_DIR=/usr/local/ssl
 echo export OPENSSL_ROOT_DIR=/usr/local/ssl >> $HOME/.bashrc
 echo export LD_LIBRARY_PATH=$CONTRAIL/build/lib:$OPENSSL_ROOT_DIR/lib >> $HOME/.bashrc
