@@ -69,7 +69,7 @@ echo export PATH=$PATH:/usr/local/go/bin >> $HOME/.bashrc
 
 # install, customize and configure compat ssl 1.0.2o
 mkdir -p /tmp/raven-release
-wget -nv --tries=3 -c --no-check-certificate -P /tmp/raven-release ${SITE_MIRROR:-"https://pkgs.sysadmins.ws"}/el9/base/x86_64/raven-release.el9.noarch.rpm
+wget -nv --tries=3 -c -P /tmp/raven-release ${SITE_MIRROR:-"https://pkgs.sysadmins.ws"}/el9/base/x86_64/raven-release.el9.noarch.rpm
 rpm -ivh /tmp/raven-release/raven-release.el9.noarch.rpm
 rm -f /tmp/raven-release/raven-release.el9.noarch.rpm
 
